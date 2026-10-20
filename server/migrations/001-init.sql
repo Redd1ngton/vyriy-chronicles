@@ -1,0 +1,13 @@
+PRAGMA journal_mode=WAL;
+CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY);
+INSERT OR IGNORE INTO migrations VALUES(1);
+CREATE TABLE IF NOT EXISTS rooms(id TEXT PRIMARY KEY, snapshot TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, room TEXT, player TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS operations(
+ room TEXT,
+ player TEXT,
+ op TEXT,
+ request TEXT NOT NULL,
+ response TEXT NOT NULL,
+ PRIMARY KEY(room,player,op)
+);

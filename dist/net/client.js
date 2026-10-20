@@ -1,0 +1,14 @@
+import {Simulation} from '../core/simulation.js';import {uid} from '../core/rules.js';import {saveLocal} from '../core/storage.js';
+export class LocalSession{
+constructor(saved,hero){this.sim=new Simulation(saved);this.id=hero?.id||Object.keys(saved.players)[0];if(hero)this.sim.addPlayer(hero.classId,hero.name,hero.id,hero);this.mode='local';this.error=null;this.connected=true;}
+get state(){return this.sim.s}
+command(type,data={}){try{return this.sim.command(this.id,{type,...data,round:this.state.round,op:uid()})}catch(e){this.error=e.message;return{error:e.message}}}
+update(dt){this.sim.update(dt)}save(){return saveLocal(this.state)}close(){} }
+export class RemoteSession{
+constructor(base,room,id,token,state){this.base=base.replace(/\/$/,'');this.room=room;this.id=id;this.token=token;this._state=state;this.mode='online';this.connected=false;this.error=null;this.pending=new Map();this.retries=0;this.closed=false;this.connect();}
+get state(){return this._state}
+static async join(base,room,classId,name){base=base.replace(/\/$/,'');let r=await fetch(base+'/api/rooms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room:room||null,classId,name})});let data=await r.json();if(!r.ok)throw Error(data.error||'Сервер недоступний');sessionStorage.setItem('vyriy-session',JSON.stringify({base,room:data.room,id:data.id,token:data.token}));return new RemoteSession(base,data.room,data.id,data.token,data.state);}
+static async resume(){let info=JSON.parse(sessionStorage.getItem('vyriy-session')||'null');if(!info)return null;let r=await fetch(info.base+'/api/rooms/'+info.room,{headers:{Authorization:'Bearer '+info.token}});if(!r.ok)return null;let data=await r.json();return new RemoteSession(info.base,info.room,info.id,info.token,data.state);}
+connect(){if(this.closed)return;let url=this.base.replace(/^http/,'ws')+'/api/rooms/'+this.room+'/socket';this.ws=new WebSocket(url,['vyriy',this.token]);this.ws.onopen=()=>{this.connected=true;this.retries=0;for(let i of this.pending.values())this.ws.send(JSON.stringify(i));};this.ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch{return}if(m.type==='state'){if(!this._state||m.state.eventSeq>=this._state.eventSeq)this._state=m.state;}if(m.type==='ack'){this.pending.delete(m.op);if(m.error)this.error=m.error;}if(m.type==='error')this.error=m.error;};this.ws.onclose=()=>{this.connected=false;if(!this.closed)setTimeout(()=>this.connect(),Math.min(10000,500*2**this.retries++));};this.ws.onerror=()=>this.error='З’єднання втрачено. Повторне підключення…';}
+command(type,data={}){if(!this.connected)return{error:'Немає з’єднання. Ваш стан відновиться після підключення.'};let i={type,...data,round:this.state.round,op:uid()};this.pending.set(i.op,i);this.ws.send(JSON.stringify(i));return{ok:true}}
+update(){}save(){return true}close(){this.closed=true;this.ws?.close();}}
