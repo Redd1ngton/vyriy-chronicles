@@ -36,3 +36,9 @@ if(z.roads.some(r=>x>=r.x-1&&y>=r.y-1&&x<r.x+r.w+1&&y<r.y+r.h+1)||z.objects.some
 return treeHash(x,y)>(z.kind==='forest'?.68:.91);}
 
 Object.assign(ITEM_TEMPLATES,{herb:{name:'Лісова трава',kind:'material',icon:'❧',price:5,stats:{},requirements:{level:1}},fang:{name:'Звіряче ікло',kind:'material',icon:'▼',price:9,stats:{},requirements:{level:1}},ore:{name:'Оберегова руда',kind:'material',icon:'◈',price:15,stats:{},requirements:{level:1}}});
+
+import {expandWorld} from './expansion.js';
+expandWorld(ZONES,ENEMIES,ITEM_TEMPLATES);
+REGION.zones=Object.keys(ZONES);
+import {installEquipment} from './progression.js';
+installEquipment(ITEM_TEMPLATES);
