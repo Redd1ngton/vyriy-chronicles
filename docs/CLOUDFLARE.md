@@ -1,3 +1,22 @@
+# Розгортання клієнта на Workers · 0.3.1
+
+У корені є `wrangler.jsonc`, який вказує `assets.directory = ./dist` та `main = worker/index.js`.
+
+У Cloudflare Workers Builds для репозиторію:
+
+- Root directory: `/` (корінь репозиторію).
+- Build command: `npm run build`.
+- Deploy command: `npx wrangler deploy`.
+- Production branch: `main`.
+
+Після оновлення `main` дочекайтеся нового deployment. Не використовуйте `npm start` як build/deploy: він запускає Node HTTP/WebSocket/SQLite сервер, який не є Worker. Worker у цьому виправленні надає локальну гру та чесний `/api/health` без обіцянки онлайн-кімнат. Платні служби не підключено.
+
+Перевірки: корінь має віддавати HTML гри, `/bootstrap.js` — JavaScript, `/content/classes.js?v=0.3.1` — JavaScript, `/assets/heroes-v2.png` — PNG; `/api/health` — JSON з `mode: static-local`. Екран завантаження має змінитися вибором героя. Збереження v2/v3 зберігаються.
+
+Офіційна конфігурація static assets: https://developers.cloudflare.com/workers/static-assets/configuration/
+
+---
+
 # Сервер і безкоштовні обмеження — перевірено 20.10.2026
 
 ## Фактичне розгортання

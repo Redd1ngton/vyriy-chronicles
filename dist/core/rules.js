@@ -1,6 +1,6 @@
-import {SETS} from '../content/progression.js';
-import {CLASSES,EFFECTS,STAT_KEYS} from '../content/classes.js';
-import {ITEM_TEMPLATES,ZONES,ENEMIES,treeAt} from '../content/region.js';
+import {SETS} from '../content/progression.js?v=0.3.1';
+import {CLASSES,EFFECTS,STAT_KEYS} from '../content/classes.js?v=0.3.1';
+import {ITEM_TEMPLATES,ZONES,ENEMIES,treeAt} from '../content/region.js?v=0.3.1';
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export const uid=()=>globalThis.crypto?.randomUUID?.()||`${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 export function createItem(template,owner,extra={}){if(!ITEM_TEMPLATES[template])throw Error('Невідомий предмет');return{id:uid(),template,owner,quality:0,rarity:ITEM_TEMPLATES[template].rarity||'common',...extra};}

@@ -10,3 +10,20 @@
 .inventory-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.inventory-tabs .btn{min-height:44px;margin:0}.card .item-id{overflow-wrap:anywhere}
 
 .card details{font-size:11px;margin:10px 0;color:#b3bba7}.card summary{cursor:pointer;min-height:32px;display:flex;align-items:center}@media(max-width:500px){.card-grid{grid-template-columns:1fr}.card h3{font-size:18px}}
+
+#startup{position:absolute;inset:0;z-index:100;background:#142d2bf5;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:28px}#startup h2{font:30px var(--serif);color:var(--gold)}#startup p{max-width:440px;line-height:1.7}#startup small{margin-top:22px;color:var(--muted)}#startup progress{accent-color:var(--gold);width:min(280px,80vw)}#startup-retry{min-height:48px;padding:12px 24px;background:var(--gold);color:#142d2b;border-radius:8px}
+@media(max-width:600px),(pointer:coarse){
+ #joystick{display:block;left:auto;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(38px + env(safe-area-inset-bottom,0px));width:112px;height:112px;z-index:4;background:#11332c88}
+ #joy-knob{left:37px;top:37px;width:38px;height:38px}
+ .actionbar{left:calc(12px + env(safe-area-inset-left,0px));right:auto;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:none;width:198px;height:178px;padding:0;border:0;background:none;box-shadow:none;display:block;pointer-events:none}
+ .actionbar .action{position:absolute;max-width:none;border-radius:50%;width:61px;height:61px;gap:3px;pointer-events:auto;box-shadow:0 3px 12px #071f2555}
+ .actionbar .action b{font-size:26px}.actionbar .action>span{font-size:8px}.actionbar .action kbd{display:none}
+ .actionbar #attack{left:7px;bottom:4px;width:88px;height:88px;border:2px solid #d8bd7b;background:linear-gradient(#a28a55,#5b5034)}
+ .actionbar #attack b{font-size:35px}.actionbar #attack>span{font-size:11px;font-weight:650}
+ .actionbar #skill0{left:0;bottom:104px}.actionbar #skill1{left:69px;bottom:91px}.actionbar #potion{left:108px;bottom:31px}
+ .actionbar #interact{position:fixed;left:auto;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(174px + env(safe-area-inset-bottom,0px));width:65px;height:65px}
+ .utilitybar{bottom:calc(254px + env(safe-area-inset-bottom,0px));right:calc(16px + env(safe-area-inset-right,0px));gap:5px}.utilitybar button{min-width:44px;height:44px}
+ #event-log{bottom:calc(222px + env(safe-area-inset-bottom,0px));left:12px;max-width:170px}#cast-hud{bottom:calc(220px + env(safe-area-inset-bottom,0px))}#save-status{bottom:8px;right:16px}
+}
+@media(max-height:520px) and (orientation:landscape) and (pointer:coarse){.utilitybar{bottom:14px;right:160px}#event-log{display:none}.quest-hud{top:88px;right:160px;width:180px}#joystick{bottom:24px}.actionbar{bottom:15px}.actionbar #interact{bottom:155px}}
+@media(max-width:360px){.actionbar{left:8px;width:180px}.actionbar #attack{width:80px;height:80px}.actionbar .action{width:56px;height:56px}.actionbar #skill0{bottom:94px}.actionbar #skill1{left:64px;bottom:83px}.actionbar #potion{left:100px;bottom:25px}#joystick{right:12px;width:100px;height:100px}#joy-knob{left:31px;top:31px}.actionbar #interact{right:12px}.utilitybar{right:12px}}

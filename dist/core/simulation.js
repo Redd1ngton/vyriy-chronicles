@@ -1,10 +1,10 @@
-import {QUESTS} from '../content/quests.js';
-import {SETS,killXP,recommendedStat} from '../content/progression.js';
-import {upgradeSave} from './storage.js';
-import {questReady,questAvailable,track} from './quest-rules.js';
-import {CLASSES,BRANCH_RULES,skillFor} from '../content/classes.js';
-import {ZONES,ENEMIES,ITEM_TEMPLATES} from '../content/region.js';
-import {uid,makeHero,derive,damage,hitChance,addEffect,has,heal,takeDamage,tickEffects,gainXP,equip,createItem,move,pathfind,blocked,lineOfSight,validateName} from './rules.js';
+import {QUESTS} from '../content/quests.js?v=0.3.1';
+import {SETS,killXP,recommendedStat} from '../content/progression.js?v=0.3.1';
+import {upgradeSave} from './storage.js?v=0.3.1';
+import {questReady,questAvailable,track} from './quest-rules.js?v=0.3.1';
+import {CLASSES,BRANCH_RULES,skillFor} from '../content/classes.js?v=0.3.1';
+import {ZONES,ENEMIES,ITEM_TEMPLATES} from '../content/region.js?v=0.3.1';
+import {uid,makeHero,derive,damage,hitChance,addEffect,has,heal,takeDamage,tickEffects,gainXP,equip,createItem,move,pathfind,blocked,lineOfSight,validateName} from './rules.js?v=0.3.1';
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 export class Simulation{
 constructor(saved=null,rng=Math.random){this.rng=rng;this.state=saved?upgradeSave(saved):{version:3,contentRevision:3,zone:'village',players:{},enemies:[],projectiles:[],hazards:[],traps:[],events:[],flags:{seals:[],zoneBosses:{}},claims:[],offers:[],vote:null,leader:null,round:1,eventSeq:0,clock:0,operations:{}};this.actions=new Map();if(!this.state.enemies.length||this.state.contentRevision!==3){this.populate();this.state.contentRevision=3;}}

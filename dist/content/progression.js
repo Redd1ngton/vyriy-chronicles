@@ -1,4 +1,4 @@
-import {CLASSES} from './classes.js';
+import {CLASSES} from './classes.js?v=0.3.1';
 export const RARITIES={common:{name:'Звичайний',color:'#b5bcae'},uncommon:{name:'Незвичайний',color:'#9ac684'},rare:{name:'Рідкісний',color:'#88b5e4'},epic:{name:'Епічний',color:'#b89add'},legendary:{name:'Легендарний',color:'#e7bc72'}};
 export const SETS={};
 const themes={swordsman:'Варти сталі',mage:'Зоряного кола',archer:'Слідопита',acolyte:'Берегині світла',merchant:'Першого горна',thief:'Тихої тіні',gunslinger:'Срібного патрона'};

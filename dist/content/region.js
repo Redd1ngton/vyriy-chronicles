@@ -37,8 +37,8 @@ return treeHash(x,y)>(z.kind==='forest'?.68:.91);}
 
 Object.assign(ITEM_TEMPLATES,{herb:{name:'Лісова трава',kind:'material',icon:'❧',price:5,stats:{},requirements:{level:1}},fang:{name:'Звіряче ікло',kind:'material',icon:'▼',price:9,stats:{},requirements:{level:1}},ore:{name:'Оберегова руда',kind:'material',icon:'◈',price:15,stats:{},requirements:{level:1}}});
 
-import {expandWorld} from './expansion.js';
+import {expandWorld} from './expansion.js?v=0.3.1';
 expandWorld(ZONES,ENEMIES,ITEM_TEMPLATES);
 REGION.zones=Object.keys(ZONES);
-import {installEquipment} from './progression.js';
+import {installEquipment} from './progression.js?v=0.3.1';
 installEquipment(ITEM_TEMPLATES);

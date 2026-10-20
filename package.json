@@ -1,13 +1,14 @@
 {
   "name": "vyriy-chronicles",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node server/index.js",
     "start": "node server/index.js",
     "check": "node scripts/check.mjs",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",
