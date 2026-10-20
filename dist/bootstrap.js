@@ -8,5 +8,5 @@
  window.addEventListener('vyriy-startup-error',e=>fail(e.detail||'Помилка запуску. Спробуйте перезавантажити сторінку.'));
  retry.addEventListener('click',()=>{let url=new URL(location.href);url.searchParams.set('reload',Date.now());location.replace(url)});
  const watchdog=setTimeout(()=>fail('Завантаження триває надто довго. Перевірте з’єднання та спробуйте ще раз.'),30000);
- const script=document.createElement('script');script.src='assets/phaser-3.90.0.min.js';script.onload=()=>import('./ui/app.js?v=0.3.1').catch(e=>fail('Помилка завантаження гри: '+e.message));script.onerror=()=>fail('Не вдалося завантажити ігровий рушій. Перевірте з’єднання.');document.head.append(script);
+ const script=document.createElement('script');script.src='assets/phaser-3.90.0.min.js?v=0.3.2';script.onload=()=>{if(!window.Phaser?.Scene||!window.Phaser?.Game){fail('Ігровий рушій не запустився. Оновіть сторінку та спробуйте ще раз.');return;}import('./ui/app.js?v=0.3.1').catch(e=>fail('Помилка завантаження гри: '+e.message));};script.onerror=()=>fail('Не вдалося завантажити ігровий рушій. Перевірте з’єднання.');document.head.append(script);
 })();
