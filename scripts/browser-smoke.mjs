@@ -26,6 +26,12 @@ for(const [name,type,options] of [
    assert.ok(joy&&attack&&joy.x>attack.x+attack.width,'Right joystick and left attack');
    assert.ok(attack.width>=80,'Large touch attack');
   }
+  assert.equal(await page.locator('#quest-drawer-toggle').getAttribute('aria-expanded'),'false');
+  await page.locator('#quest-drawer-toggle').click();assert.equal(await page.locator('#quest-drawer-toggle').getAttribute('aria-expanded'),'true');
+  await page.locator('#quest-drawer-toggle').click();assert.equal(await page.locator('#quest-drawer-toggle').getAttribute('aria-expanded'),'false');
+  await page.waitForFunction(()=>document.getElementById('quest-drawer-body').getBoundingClientRect().x>=innerWidth-1);
+  const tracker=await page.locator('#quest-drawer-body').boundingBox();
+  if(name==='mobile')assert.ok(tracker.x>=380,'Collapsed journal leaves the mobile playfield');
   await page.locator('#inventory-open').click();
   await page.locator('#modal[open]').waitFor();
   await page.locator('#modal-close').click();
