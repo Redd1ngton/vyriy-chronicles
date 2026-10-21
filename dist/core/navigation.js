@@ -1,0 +1,16 @@
+import {QUESTS} from '../content/quests.js?v=0.3.1';
+import {ZONES,ENEMIES} from '../content/region.js?v=0.3.1';
+import {objectiveProgress,questReady} from './quest-rules.js?v=0.3.1';
+export const trackedQuest=h=>QUESTS.find(q=>q.id===h.trackedQuest&&h.quests?.[q.id]?.status!=='completed')||QUESTS.find(q=>h.quests?.[q.id]?.status==='active');
+const doors=z=>ZONES[z].objects.filter(o=>['portal','door'].includes(o.kind));
+const lock=(o,h,s)=>o.minLevel>h.level?'Потрібен рівень '+o.minLevel:o.requiresQuest&&h.quests?.[o.requiresQuest]?.status!=='completed'?'Спочатку завершіть попереднє випробування':o.requires==='seals'&&s.flags.seals.length<3?'Спочатку зберіть три печатки':o.requires&&o.requires!=='seals'&&!s.flags[o.requires]?'Спочатку завершіть сюжет місцевості':'';
+export function zoneRoute(from,to,h,s,locked=false){let queue=[{zone:from,route:[]}],seen=new Set([from]);for(let {zone,route} of queue){if(zone===to)return route;for(let o of doors(zone)){if(seen.has(o.to)||(!locked&&lock(o,h,s)))continue;seen.add(o.to);queue.push({zone:o.to,route:[...route,o]});}}return null;}
+export function questNavigation(h,s){let q=trackedQuest(h);if(!q)return null;let status=h.quests?.[q.id]?.status,ready=status==='active'&&questReady(h,s,q),targets=[];
+ const objects=Object.values(ZONES).flatMap(z=>z.objects.map(o=>({...o,zone:z.id})));
+ if(ready||status!=='active')targets=objects.filter(o=>o.id===q.npc).map(o=>({...o,label:(ready?'Здати: ':'Взяти: ')+o.name}));
+ else {let objectives=q.objectives.filter(o=>objectiveProgress(h,s,o)<o.count);for(let o of objectives){let wanted=objects.filter(p=>(o.type==='collect'&&p.questItem===o.id&&!s.claims.includes('questObject:'+p.id+':'+h.id))||(o.type==='interact'&&p.id===o.id)||(o.type==='flag'&&(p.flag===o.id||o.id==='seals'&&p.kind==='relic'&&!s.flags.seals.includes(p.id)||o.id==='switch'&&p.kind==='lever'||o.id==='wardBroken'&&p.kind==='ward'||o.id==='ending'&&p.kind==='altar')));targets.push(...wanted.map(p=>({...p,label:p.name})));
+ for(let z of Object.values(ZONES)){for(let e of z.enemies){let t=ENEMIES[e.type];if(!(o.type==='kill'&&e.type===o.id||o.type==='collect'&&t.loot===o.id||o.type==='flag'&&t.bossFlag===o.id||o.type==='flag'&&o.id==='boss'&&z.id==='crypt'&&t.boss))continue;if(z.id===s.zone){let live=s.enemies.filter(p=>p.type===e.type&&!p.dead);if(live.length){targets.push(...live.map(p=>({...p,zone:z.id,label:p.name,centered:true})));continue;}}targets.push({...e,zone:z.id,label:t.name+' · місце появи'});}}
+ }}
+ let candidates=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s)})).filter(t=>t.route!==null).sort((a,b)=>a.route.length-b.route.length||Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y));let t=candidates[0];if(!t){let locked=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s,true)})).filter(t=>t.route?.length).sort((a,b)=>a.route.length-b.route.length)[0];if(!locked)return{quest:q,label:'Ціль поки недоступна · перевірте журнал',blocked:true};t=locked;}
+ let step=t.route[0],reason=step?lock(step,h,s):'',target=step||t;return{quest:q,x:target.x+(target.centered?0:.5),y:target.y+(target.centered?0:.5),label:step?'→ '+ZONES[step.to].name+' · '+t.label:t.label,ready,blocked:!!reason,reason};
+}
