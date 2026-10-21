@@ -51,3 +51,5 @@ for(let [zone,x,y] of [['village',18,25],['castlevault',12,43]])ZONES[zone].obje
 
 import {installJourneys} from './journeys.js?v=0.6.0';
 installJourneys(ZONES,ITEM_TEMPLATES);
+import {installLivingWorld} from './living-world.js?v=0.8.0';
+installLivingWorld(ZONES,ENEMIES,ITEM_TEMPLATES);

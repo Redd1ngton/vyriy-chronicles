@@ -8,8 +8,8 @@ import {uid,derive,createItem,equip,pathfind} from '../dist/core/rules.js?v=0.3.
 import {questAvailable,questsForNPC} from '../dist/core/quest-rules.js?v=0.3.1';
 const cmd=(sim,h,type,data={})=>sim.command(h.id,{type,...data,op:uid(),round:sim.s.round});
 function atNPC(sim,h,id){const z=Object.values(ZONES).find(z=>z.objects.some(o=>o.id===id));sim.s.zone=z.id;sim.populate();h.zone=z.id;const npc=z.objects.find(o=>o.id===id);h.x=npc.x+.5;h.y=npc.y+.5;}
-test('18 locations, 56 quests, 18 genuinely new ordinary types and six bosses are wired into the world',()=>{
- assert.equal(Object.keys(ZONES).length,18);assert.equal(QUESTS.length,56);
+test('18 locations, 65 quests, 18 genuinely new ordinary types and six bosses are wired into the world',()=>{
+ assert.equal(Object.keys(ZONES).length,18);assert.equal(QUESTS.length,65);
  assert.equal(NEW_ENEMIES.length,18);assert.equal(NEW_BOSSES.length,6);
  const questIds=new Set;for(const q of QUESTS){assert.ok(!questIds.has(q.id));questIds.add(q.id);assert.ok(Object.values(ZONES).some(z=>z.objects.some(o=>o.id===q.npc)),q.npc);for(const o of q.objectives){if(o.type==='collect')assert.ok(ITEM_TEMPLATES[o.id]);if(o.type==='kill')assert.ok(ENEMIES[o.id]);if(o.type==='interact')assert.ok(Object.values(ZONES).some(z=>z.objects.some(a=>a.id===o.id)));}if(q.requires)assert.ok(QUESTS.some(a=>a.id===q.requires));}
  const seen=new Set(['village']),queue=['village'];while(queue.length){const id=queue.shift();for(const o of ZONES[id].objects.filter(o=>o.to)){assert.ok(ZONES[o.to]);assert.ok(pathfind(o.to,ZONES[o.to].spawn,o.entry,{switch:true}).length||Math.hypot(o.entry.x-ZONES[o.to].spawn.x,o.entry.y-ZONES[o.to].spawn.y)<1,`${id} -> ${o.to} entry`);if(!seen.has(o.to)){seen.add(o.to);queue.push(o.to);}}}assert.equal(seen.size,18);

@@ -53,6 +53,8 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: Play boss mechanics, dungeon choices, relics, storage and journey events
         run: node scripts/browser-journeys.mjs https://vyriy.lepra-soa.workers.dev
+      - name: Verify factions, homestead, secrets, hunting and protected inventory
+        run: node scripts/browser-living-world.mjs https://vyriy.lepra-soa.workers.dev
       - uses: actions/upload-artifact@v4
         if: always()
         with:

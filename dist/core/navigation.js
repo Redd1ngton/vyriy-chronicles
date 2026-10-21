@@ -15,7 +15,12 @@ export function questNavigation(h,s){let q=trackedQuest(h);if(!q)return null;let
  let step=t.route[0],reason=step?lock(step,h,s):'',target=step||t;return{quest:q,x:target.x+(target.centered?0:.5),y:target.y+(target.centered?0:.5),label:step?'→ '+ZONES[step.to].name+' · '+t.label:t.label,ready,blocked:!!reason,reason};
 }
 
+export function huntNavigation(h,s){
+ const hunt=h.huntTarget;if(!hunt)return null;const targets=[];for(const z of Object.values(ZONES)){for(const spawn of z.enemies.filter(e=>e.type===hunt.enemy)){const live=z.id===s.zone?s.enemies.filter(e=>e.type===hunt.enemy&&!e.dead&&!e.dungeonLocked):[];targets.push(...(live.length?live.map(e=>({...e,zone:z.id,centered:true})): [{...spawn,zone:z.id,waiting:z.id===s.zone}]));}}
+ const candidates=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s)})).filter(t=>t.route!==null).sort((a,b)=>a.route.length-b.route.length||Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y));let t=candidates[0];if(!t){const locked=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s,true)})).filter(t=>t.route?.length).sort((a,b)=>a.route.length-b.route.length)[0];if(!locked)return{hunt:true,blocked:true,label:'Шлях до здобичі поки недоступний'};t=locked;}const step=t.route[0],target=step||t,reason=step?lock(step,h,s):'',progress=hunt.template?' · трофеї '+(h.bestiary?.[hunt.enemy]?.trophies||0)+'/20':'';return{hunt:true,x:target.x+(target.centered?0:.5),y:target.y+(target.centered?0:.5),blocked:!!reason,reason,label:(step?'→ '+ZONES[step.to].name+' · ':'')+ENEMIES[hunt.enemy].name+(t.waiting?' · місце появи / повторний данж':'')+progress};
+}
 export function navigationGoal(h,s){
+ if(h.navigationMode==='hunt')return huntNavigation(h,s);
  if(h.navigationMode!=='quest'){
   let enemies=[];
   if(s.dungeonRun?.status==='active'){
