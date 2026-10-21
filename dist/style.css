@@ -214,3 +214,11 @@ html.game-focus .location,html.game-focus .controls-hint,html.game-focus #event-
  #modal.creating #modal-body .creation-actions .btn{min-height:32px;padding:4px 8px;font-size:11px}
 }
 #game-shell{touch-action:manipulation}#modal.creating{touch-action:none}#modal:not(.creating),#modal:not(.creating) #modal-body{touch-action:pan-y}
+
+#modal.creating .creation-role{font-size:11px;color:var(--muted)}
+@container (max-width:600px) and (min-height:360px) and (max-height:600px){
+ #modal.creating #modal-body .class-card{grid-template-columns:32px 1fr;grid-template-rows:1fr;gap:5px}
+ #modal.creating #modal-body .class-card .preview-art{grid-row:auto;width:32px;height:36px}
+ #modal.creating #modal-body .class-card b{align-self:center}
+ #modal.creating #modal-body .class-card small{display:none}
+}
