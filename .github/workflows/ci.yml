@@ -81,9 +81,11 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 --directory dist > /tmp/vyriy-preview.log 2>&1 &
           preview_pid=$!
           trap 'kill "$preview_pid"' EXIT
-          node scripts/browser-smoke.mjs http://127.0.0.1:4173
-          node scripts/browser-trials.mjs http://127.0.0.1:4173
-          node scripts/browser-living-world.mjs http://127.0.0.1:4173
+          task_test_status=0
+          node scripts/browser-smoke.mjs http://127.0.0.1:4173 || task_test_status=1
+          node scripts/browser-trials.mjs http://127.0.0.1:4173 || task_test_status=1
+          node scripts/browser-living-world.mjs http://127.0.0.1:4173 || task_test_status=1
+          exit "$task_test_status"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
