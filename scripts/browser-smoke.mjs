@@ -74,6 +74,7 @@ for(const [name,type,options] of [
   await page.locator('#modal-close').click();
   await page.waitForTimeout(1200);
   await page.screenshot({path:'browser-evidence/'+name+'.png'});
+  if(name==='desktop'){const zoom=await page.locator('#scene canvas').getAttribute('data-camera-zoom');for(const size of [{width:540,height:800},{width:1440,height:900}]){await page.setViewportSize(size);await page.waitForTimeout(250);assert.equal(await page.locator('#scene canvas').getAttribute('data-camera-zoom'),zoom,'Resizing desktop also preserves the initial camera distance');}}
   assert.deepEqual(errors,[],'Uncaught browser errors');
   console.log(name+': engine, scene, character creation, HUD and inventory passed');
  }catch(error){
