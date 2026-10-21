@@ -29,6 +29,7 @@ export function mechanicDeath(sim,e){
 export function bossMechanic(sim,e,h,dt){
  if(!['crystalmatriarch','scarletregent','frostking'].includes(e.type))return false;
  if(e.hintUntil&&sim.s.clock>e.hintUntil&&!e.ritual&&!e.mechanicShield){e.mechanicHint='';e.hintUntil=0;}
+ if(e.cast?.kind==='blizzard')return false;
  if(e.mechanicShield){e.mechanicHint='Розбийте два кришталеві кокони: вони захищають матріарху.';return true;}
  if(e.ritual){e.ritual.left-=dt;e.action='cast';e.actionTime=.3;if(e.ritual.left<=0){e.ritual=null;e.cast=null;e.hp=Math.min(e.maxHp,e.hp+e.maxHp*.08);e.mechanicHint='Ритуал завершено: Регент відновив 8% HP. Відійдіть від вибуху!';e.hintUntil=sim.s.clock+4;sim.s.hazards.push({id:uid(),x:e.x,y:e.y,radius:5,inner:0,left:1,total:1,source:e.id,kind:'ritual',atk:e.atk*2.5,effect:'curse',duration:5,color:0xb878d4,label:'Вибух ритуалу'});sim.event('telegraph',{actor:e.id,text:e.mechanicHint});}return true;}
  const stage=e.mechanicStage||0,threshold=e.type==='crystalmatriarch'?[.7,.35][stage]:e.type==='scarletregent'?[.65,.3][stage]:[.65,.3][stage];
@@ -41,7 +42,7 @@ export function bossMechanic(sim,e,h,dt){
  }else if(e.type==='scarletregent'){
   e.ritual={left:8,total:8,hits:0};e.mechanicHint='Ритуал · 8 с. Перервіть бойовою навичкою або шістьма звичайними влучаннями!';
  }else{
-  clearBossObjects(sim,e.id);
+  clearBossObjects(sim,e.id);e.cast={left:5,total:5,kind:'blizzard'};e.action='cast';e.actionTime=5;
   const covers=[[-3,2],[2,3]].map(([x,y])=>({id:uid(),kind:'cover',name:'Крижана колона · укриття',...openPoint(sim,{x:e.x+x,y:e.y+y}),bossOwner:e.id}));
   sim.s.encounterObjects??=[];sim.s.encounterObjects.push(...covers);
   sim.s.hazards.push({id:uid(),x:e.x,y:e.y,radius:9,inner:0,left:5,total:5,source:e.id,kind:'blizzard',atk:e.atk*3,effect:'slow',duration:4,color:0x83cbe9,label:'Хуртовина · сховайтеся за колоною',covers:covers.map(c=>({x:c.x,y:c.y}))});

@@ -63,3 +63,8 @@ html.game-fullscreen,html.game-fullscreen body{width:100%;height:100%;overflow:h
 @media(max-height:520px) and (orientation:landscape){#mechanic-hud{top:111px;font-size:10px;max-width:280px;padding:6px}}
 
 .navigation-mode{padding:8px;display:flex;gap:5px;flex-wrap:wrap}.navigation-mode[hidden]{display:none}.navigation-mode button{font-size:9px;padding:9px 6px;background:#29483c;border-radius:5px;flex:1}.navigation-mode button[aria-pressed="true"]{color:#1a3028;background:#c1a56c}
+
+/* Keep close/title reachable while long mobile panels scroll. */
+dialog[open]{display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
+.modal-header{flex:0 0 auto}#modal-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px}
+@media(max-height:520px) and (orientation:landscape){.modal-header{margin-bottom:10px}.modal-header h2{font-size:21px}.modal-header .eyebrow{font-size:7px}}
