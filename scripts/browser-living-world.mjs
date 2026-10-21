@@ -5,7 +5,7 @@ import {chromium,webkit,devices} from 'playwright';
 import {Simulation} from '../dist/core/simulation.js?v=0.3.1';
 import {ZONES} from '../dist/content/region.js?v=0.3.1';
 import {derive,createItem} from '../dist/core/rules.js?v=0.3.1';
-const origin=process.argv[2];if(!origin?.startsWith('https://'))throw Error('HTTPS deployment required');
+const origin=process.argv[2];if(!origin?.startsWith('https://')&&origin!=='http://127.0.0.1:4173')throw Error('HTTPS deployment or isolated CI preview required');
 mkdirSync('journey-evidence',{recursive:true});
 function fixture(zone,id){const sim=new Simulation(null,()=>.99);sim.s.zone=zone;sim.populate();const h=sim.addPlayer('mage','Перевірка');h.level=40;h.zeny=50000;h.echoes=50;h.reputation={ward:250,grove:250,forge:250};h.bestiary={wolf:{kills:10,trophies:10},warden:{kills:1,trophies:5}};for(const type of ['herb','ore','embershard','spore'])for(let i=0;i<20;i++)h.inventory.push(createItem(type,h.id));const item=createItem('armor',h.id);h.inventory.push(item);const o=ZONES[zone].objects.find(o=>o.id===id);h.x=o.x+.5;h.y=o.y+.5;h.hp=derive(h).hp;h.sp=derive(h).sp;for(const e of sim.s.enemies)e.aggression='passive';return{sim,h,item};}
 async function open(browser,f,options){const context=await browser.newContext(options);await context.addInitScript(s=>localStorage.setItem('vyriy-save-v2',JSON.stringify(s)),f.sim.s);const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/?living-world-check=0.8',{waitUntil:'networkidle'});await page.locator('#continue-local').click();await page.waitForFunction(()=>document.getElementById('startup').hidden&&!document.getElementById('modal').open);return{context,page,errors};}
