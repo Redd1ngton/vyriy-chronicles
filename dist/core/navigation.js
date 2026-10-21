@@ -14,3 +14,18 @@ export function questNavigation(h,s){let q=trackedQuest(h);if(!q)return null;let
  let candidates=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s)})).filter(t=>t.route!==null).sort((a,b)=>a.route.length-b.route.length||Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y));let t=candidates[0];if(!t){let locked=targets.map(t=>({...t,route:zoneRoute(s.zone,t.zone,h,s,true)})).filter(t=>t.route?.length).sort((a,b)=>a.route.length-b.route.length)[0];if(!locked)return{quest:q,label:'Ціль поки недоступна · перевірте журнал',blocked:true};t=locked;}
  let step=t.route[0],reason=step?lock(step,h,s):'',target=step||t;return{quest:q,x:target.x+(target.centered?0:.5),y:target.y+(target.centered?0:.5),label:step?'→ '+ZONES[step.to].name+' · '+t.label:t.label,ready,blocked:!!reason,reason};
 }
+
+export function navigationGoal(h,s){
+ if(h.navigationMode!=='quest'){
+  let enemies=[];
+  if(s.dungeonRun?.status==='active'){
+   const ids=s.dungeonRun.guards;
+   enemies=s.enemies.filter(e=>!e.dead&&ids.includes(e.id));
+   if(!enemies.length)enemies=s.enemies.filter(e=>!e.dead&&e.mechanicTarget);
+   if(!enemies.length)enemies=s.enemies.filter(e=>!e.dead&&e.boss);
+  }else if(s.travelEvent?.status==='active')enemies=s.enemies.filter(e=>!e.dead&&s.travelEvent.enemyIds.includes(e.id));
+  const target=enemies.sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y))[0];
+  if(target)return{x:target.x,y:target.y,label:'→ '+target.name,activity:true};
+ }
+ return questNavigation(h,s);
+}

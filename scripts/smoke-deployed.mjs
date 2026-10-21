@@ -6,7 +6,7 @@ const origin=process.argv[2];
 if(!origin||!/^https:\/\//.test(origin))throw Error('Pass the HTTPS deployment origin');
 async function fetchFile(path){const r=await fetch(new URL(path,origin),{signal:AbortSignal.timeout(10000),cache:'no-store'});assert.equal(r.status,200,path+' HTTP '+r.status);return r}
 let ready=false,last;
-for(let attempt=0;attempt<18;attempt++){try{const r=await fetchFile('/');const html=await r.text();assert.ok(html.includes('<meta name="vyriy-release" content="0.5.2">'),'Waiting for 0.5.2 deployment');const engineResponse=await fetchFile('/assets/phaser-3.90.0.min.js?v=0.3.2');try{new Script(await engineResponse.text())}catch{throw Error('Waiting for valid Phaser build')}ready=true;break}catch(e){last=e;console.log('Waiting for deployment:',e.message);await new Promise(r=>setTimeout(r,10000))}}
+for(let attempt=0;attempt<18;attempt++){try{const r=await fetchFile('/');const html=await r.text();assert.ok(html.includes('<meta name="vyriy-release" content="0.6.0">'),'Waiting for 0.6.0 deployment');const engineResponse=await fetchFile('/assets/phaser-3.90.0.min.js?v=0.3.2');try{new Script(await engineResponse.text())}catch{throw Error('Waiting for valid Phaser build')}ready=true;break}catch(e){last=e;console.log('Waiting for deployment:',e.message);await new Promise(r=>setTimeout(r,10000))}}
 if(!ready)throw last;
 const modules=[];
 function collect(dir){for(const e of readdirSync(dir,{withFileTypes:true})){const path=dir+'/'+e.name;if(e.isDirectory()){if(e.name!=='assets')collect(path)}else if(e.name.endsWith('.js'))modules.push('/'+path.slice(5)+'?v=0.3.1')}}

@@ -36,3 +36,25 @@ jobs:
         with:
           name: browser-startup-evidence
           path: browser-evidence/
+
+  journey-systems:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Wait for the current Cloudflare release
+        run: node scripts/smoke-deployed.mjs https://vyriy.lepra-soa.workers.dev
+      - run: npm install --no-save --package-lock=false playwright@1.56.1
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Play boss mechanics, dungeon choices, relics, storage and journey events
+        run: node scripts/browser-journeys.mjs https://vyriy.lepra-soa.workers.dev
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: journey-systems-evidence
+          path: journey-evidence/

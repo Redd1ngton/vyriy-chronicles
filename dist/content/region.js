@@ -48,3 +48,6 @@ REGION.zones=Object.keys(ZONES);
 
 ITEM_TEMPLATES.embershard={name:'Жар-уламок',kind:'material',icon:'✦',price:60,stats:{},requirements:{level:1},desc:'Матеріал гартування. Елітні вороги, данжі або розбір спорядження.'};
 for(let [zone,x,y] of [['village',18,25],['castlevault',12,43]])ZONES[zone].objects.push({id:zone+'-anvil',kind:'forge',name:'Ковадло зоряного коваля',x,y,art:9});
+
+import {installJourneys} from './journeys.js?v=0.6.0';
+installJourneys(ZONES,ITEM_TEMPLATES);

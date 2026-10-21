@@ -1,0 +1,36 @@
+// All state below is synthetic and confined to disposable browser contexts.
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+import {chromium,webkit,devices} from 'playwright';
+import {Simulation} from '../dist/core/simulation.js?v=0.3.1';
+import {ZONES} from '../dist/content/region.js?v=0.3.1';
+import {bossMechanic} from '../dist/core/encounters.js?v=0.6.0';
+import {addField} from '../dist/core/journey-runtime.js?v=0.6.0';
+import {uid,derive,createItem} from '../dist/core/rules.js?v=0.3.1';
+const origin=process.argv[2];if(!origin?.startsWith('https://'))throw Error('HTTPS deployment required');
+mkdirSync('journey-evidence',{recursive:true});
+const command=(sim,h,type,data={})=>sim.command(h.id,{type,...data,op:uid(),round:sim.s.round});
+function fixture(zone='village',level=30){let sim=new Simulation(null,()=>.99);sim.s.zone=zone;sim.populate();let h=sim.addPlayer('mage','Мандрівник');h.level=level;h.hp=derive(h).hp;h.sp=derive(h).sp;h.echoes=100;h.zeny=100000;for(let e of sim.s.enemies)e.aggression='passive';return{sim,h};}
+function at(f,kind){let o=ZONES[f.sim.s.zone].objects.find(o=>o.kind===kind);f.h.x=o.x+.5;f.h.y=o.y+.5;return o;}
+async function open(browser,f,options={}){f.sim.s.events=[];let context=await browser.newContext(options);await context.addInitScript(s=>localStorage.setItem('vyriy-save-v2',JSON.stringify(s)),f.sim.s);let page=await context.newPage(),errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error(e.stack)});await page.goto(origin+'/?journeys-check=0.6',{waitUntil:'networkidle'});await page.locator('#continue-local').click();await page.waitForFunction(()=>!document.getElementById('modal').open&&document.getElementById('startup').hidden);await page.waitForTimeout(1500);return{context,page,errors};}
+async function done(t,name){assert.deepEqual(t.errors,[],name);console.log('Journey context checked:',name);await t.context.close();}
+const browser=await chromium.launch();
+try{
+ let f=fixture(),storage=at(f,'storage'),armor=createItem('armor',f.h.id,{quality:3,card:'rune'});f.h.inventory.push(armor);for(let n=0;n<3;n++)f.h.inventory.push(createItem('ore',f.h.id));let t=await open(browser,f,{viewport:{width:1440,height:900}});
+ try{await t.page.locator('#interact').click();await t.page.locator('[data-storage-materials]').click();await t.page.locator('[data-direction="withdraw"]').first().waitFor();await t.page.locator('[data-storage-move="'+armor.id+'"][data-direction="deposit"]').click();await t.page.locator('[data-storage-move="'+armor.id+'"][data-direction="withdraw"]').waitFor();await t.page.screenshot({path:'journey-evidence/storage.png'});await t.page.locator('[data-storage-move="'+armor.id+'"][data-direction="withdraw"]').click();await t.page.locator('[data-storage-move="'+armor.id+'"][data-direction="deposit"]').waitFor();await t.page.locator('#modal-close').click();await t.page.locator('#menu-open').click();await t.page.locator('[data-feedback="sound"]').click();await t.page.waitForFunction(()=>document.querySelector('[data-feedback="sound"]').getAttribute('aria-pressed')==='false');await t.page.screenshot({path:'journey-evidence/feedback-settings.png'});}finally{await done(t,'storage and feedback');}
+ f=fixture('crystalmine',26);at(f,'camp');t=await open(browser,f,{viewport:{width:1440,height:900}});
+ try{await t.page.locator('#interact').click();await t.page.locator('[data-dungeon-start="risky"]').click();await t.page.waitForFunction(()=>document.getElementById('quest-objective').textContent.includes('Данж: вартові'));await t.page.screenshot({path:'journey-evidence/risky-route.png'});}finally{await done(t,'risky dungeon route');}
+ f=fixture('crystalmine',26);at(f,'camp');command(f.sim,f.h,'dungeonStart',{route:'safe'});for(let id of f.sim.s.dungeonRun.guards){let e=f.sim.s.enemies.find(e=>e.id===id);e.dead=true;e.hp=0;f.h.x=e.x;f.h.y=e.y;f.sim.kill(e,f.h.id);}let boss=f.sim.s.enemies.find(e=>e.boss);boss.dead=true;boss.hp=0;f.h.x=boss.x;f.h.y=boss.y;f.sim.kill(boss,f.h.id);t=await open(browser,f,{viewport:{width:1440,height:900}});
+ try{await t.page.locator('#inventory-open').click();await t.page.locator('[data-open="rewards"]').click();await t.page.screenshot({path:'journey-evidence/reward-choice.png'});await t.page.locator('[data-dungeon-choice][data-choice="relic-fireprism"]').click();await t.page.waitForFunction(()=>document.getElementById('modal-body').textContent.includes('Немає неотриманих'));await t.page.locator('#modal-close').click();await t.page.locator('#inventory-open').click();let card=t.page.locator('.card').filter({hasText:'Призма першого полум’я'});await card.getByRole('button',{name:'Спорядити',exact:true}).click();await t.page.waitForFunction(()=>Array.from(document.querySelectorAll('.card')).some(e=>e.textContent.includes('Призма першого полум’я')&&e.textContent.includes('Споряджено')));}finally{await done(t,'persistent class reward and equipment');}
+ for(let [zone,type,level]of [['crystalmine','crystalmatriarch',30],['castlespire','scarletregent',40],['frostcrypt','frostking',72]]){
+  f=fixture(zone,level);boss=f.sim.s.enemies.find(e=>e.type===type);f.h.x=boss.x-1;f.h.y=boss.y+1;boss.hp=boss.maxHp*.6;boss.aggression='aggressive';boss.aggroTarget=f.h.id;boss.aggroUntil=99;bossMechanic(f.sim,boss,f.h,.1);t=await open(browser,f,{viewport:{width:1440,height:900}});
+  try{await t.page.locator('#mechanic-hud').waitFor({state:'visible'});await t.page.screenshot({path:'journey-evidence/boss-'+type+'.png'});}finally{await done(t,'boss '+type);}
+ }
+ for(let [key,choice]of [['traveler','potion'],['caravan','fight']]){
+  let z=Object.values(ZONES).find(z=>z.objects.some(o=>o.incident===key));f=fixture(z.id,z.levels[0]);let o=at(f,'journey');t=await open(browser,f,{viewport:{width:1440,height:900}});
+  try{await t.page.locator('#interact').click();await t.page.locator('[data-journey-choice="'+o.id+'"][data-choice="'+choice+'"]').click();if(choice==='potion')await t.page.waitForFunction(()=>document.getElementById('modal-body').textContent.includes('Подію завершено'));else await t.page.waitForFunction(()=>!document.getElementById('modal').open&&document.getElementById('quest-objective').textContent.includes('Подія:'));await t.page.screenshot({path:'journey-evidence/incident-'+key+'.png'});}finally{await done(t,'incident '+key);}
+ }
+}finally{await browser.close();}
+const mobile=await webkit.launch();
+try{let f=fixture();at(f,'storage');addField(f.sim,f.h,'guardField',f.h);let t=await open(mobile,f,{...devices['iPhone 13'],viewport:{width:844,height:390}});try{let joy=await t.page.locator('#joystick').boundingBox(),attack=await t.page.locator('#attack').boundingBox();assert.ok(joy.x>attack.x+attack.width);await t.page.locator('#interact').click();await t.page.locator('[data-storage-materials]').waitFor();await t.page.screenshot({path:'journey-evidence/mobile-storage.png'});}finally{await done(t,'landscape mobile storage and controls');}}finally{await mobile.close();}
+console.log('All six systems verified on deployed site in isolated test saves.');

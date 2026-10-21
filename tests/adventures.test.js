@@ -15,7 +15,7 @@ test('all four repeatable dungeons lock the boss, reward one completion, restart
  for(let [zone,d]of Object.entries(DUNGEONS)){let {sim,h}=fixture(zone,d.level),camp=ZONES[zone].objects.find(o=>o.kind==='camp');h.x=camp.x;h.y=camp.y;let flags=structuredClone(sim.s.flags);cmd(sim,h,'dungeonStart');assert.equal(sim.s.dungeonRun.status,'active');let boss=sim.s.enemies.find(e=>e.boss);assert.ok(boss,zone);assert.equal(takeDamage(boss,999999),0);assert.equal(sim.s.dungeonRun.guards.length,3);assert.ok(pathfind(zone,camp,boss,sim.s.flags).length,zone+' reachable boss');assert.throws(()=>cmd(sim,h,'dungeonStart'));
  for(let id of sim.s.dungeonRun.guards){let e=sim.s.enemies.find(e=>e.id===id);assert.ok(e.elite);dead(sim,e,h);}
  assert.equal(boss.dungeonLocked,false);let echoes=h.echoes;dead(sim,boss,h);assert.equal(sim.s.dungeonRun.status,'completed');assert.ok(h.echoes>=echoes+5);let coins=h.zeny,count=h.inventory.length;sim.kill(boss,h.id);assert.equal(h.zeny,coins);assert.equal(h.inventory.length,count);
- let saved=validateImported(structuredClone(sim.s));assert.equal(saved.dungeonRun.status,'completed');h.x=camp.x;h.y=camp.y;cmd(sim,h,'dungeonStart');assert.ok(sim.s.enemies.find(e=>e.boss&&!e.dead));if(boss.expeditionOnly)assert.deepEqual(sim.s.flags,flags);
+ let saved=validateImported(structuredClone(sim.s));assert.equal(saved.dungeonRun.status,'completed');h.x=camp.x;h.y=camp.y;cmd(sim,h,'dungeonStart');assert.ok(sim.s.enemies.find(e=>e.boss&&!e.dead));if(boss.expeditionOnly){const {expeditionGates,...storyFlags}=sim.s.flags;assert.deepEqual(storyFlags,flags);assert.ok(expeditionGates.length);}
  sim.applyDecision({kind:'transition',to:'village',entry:ZONES.village.spawn});assert.equal(sim.s.dungeonRun,null);
  }
 });
