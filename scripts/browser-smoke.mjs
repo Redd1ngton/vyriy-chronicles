@@ -39,6 +39,7 @@ for(const [name,type,options] of [
   await page.locator('#inventory-open').click();
   await page.locator('#modal[open]').waitFor();
   await page.locator('#modal-close').click();
+  await page.waitForTimeout(1200);
   await page.screenshot({path:'browser-evidence/'+name+'.png'});
   assert.deepEqual(errors,[],'Uncaught browser errors');
   console.log(name+': engine, scene, character creation, HUD and inventory passed');
