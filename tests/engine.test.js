@@ -18,8 +18,45 @@ test('spec gates enforce levels and actually alter skill behavior',()=>{let sim=
 
 import {killXP,SETS,recommendedStat} from '../dist/content/progression.js?v=0.3.1';
 import {upgradeSave} from '../dist/core/storage.js?v=0.3.1';
+import {questsForNPC,questReady} from '../dist/core/quest-rules.js?v=0.3.1';
+test('accepted and completed objectives remain visible at the quest giver until rewarded',()=>{
+ let sim=new Simulation(),h=sim.addPlayer('mage','Тест');
+ sim.s.zone='meadow';const npc=ZONES.meadow.objects.find(o=>o.id==='beekeeper');
+ h.x=npc.x+.5;h.y=npc.y+.5;
+ cmd(sim,h.id,'questAccept',{id:'dew-medicine'});
+ assert.ok(questsForNPC(h,npc.id).some(q=>q.id==='dew-medicine'));
+ const saved=structuredClone(sim.s);sim=new Simulation(saved);h=sim.s.players[h.id];
+ for(let n=0;n<5;n++)h.inventory.push(createItem('dew',h.id));
+ const q=questsForNPC(h,npc.id).find(q=>q.id==='dew-medicine');assert.ok(q);assert.ok(questReady(h,sim.s,q));
+ assert.ok(!questsForNPC(h,'orysia').some(q=>q.id==='dew-medicine'));
+ cmd(sim,h.id,'questClaim',{id:q.id});
+ assert.equal(h.quests[q.id].status,'completed');assert.ok(!questsForNPC(h,npc.id).some(a=>a.id===q.id));
+ assert.throws(()=>cmd(sim,h.id,'questClaim',{id:q.id}));
+});
+test('rosynka XP reflects its easier combat and falls off before it becomes a farming shortcut',()=>{
+ assert.equal(killXP(1,1,false,'slime'),18);
+ assert.equal(killXP(1,1,false,'wolf'),34);
+ assert.equal(killXP(8,1,false,'slime'),0);
+ assert.ok(killXP(4,1,false,'slime')<killXP(1,1,false,'slime')*.4);
+ let sim=new Simulation(null,()=>.99),h=sim.addPlayer('mage','Тест'),xp=h.xp;
+ sim.kill({id:'dew-test',type:'slime',name:'Росинка',level:1,loot:'dew',x:h.x,y:h.y,dead:true},h.id);
+ assert.equal(h.xp-xp,18);
+ assert.equal(killXP(1,1,true,'slime'),68);
+});
+test('expanded locations offer reachable space beyond their old borders and preserve saved progress',()=>{
+ for(const z of Object.values(ZONES)){
+  assert.ok(z.size>=z.originalSize*1.35);
+  const cache=z.objects.find(o=>o.id===z.id+'-east-cache');
+  assert.ok(cache.x>z.originalSize);assert.ok(pathfind(z.id,z.spawn,cache).length, z.id+' expanded route');
+ }
+ const sim=new Simulation(),h=sim.addPlayer('mage','Тест');h.level=7;h.xp=99;h.zeny=321;
+ h.quests['first-road']={status:'active'};h.counters['interact:meadow-well']=1;
+ const original=structuredClone(sim.s),restored=new Simulation(structuredClone(original));
+ assert.deepEqual(restored.s.players,original.players);assert.deepEqual(restored.s.claims,original.claims);
+ assert.equal(pathfind('crypt',{x:4,y:26},{x:25,y:7}).length,0);
+});
 test('passive mobs stay calm, retaliate on damage; aggressive mobs acquire nearby player',()=>{let sim=new Simulation(null,()=>0);sim.s.zone='meadow';sim.populate();let h=sim.addPlayer('swordsman','Тест'),e=sim.s.enemies.find(e=>e.type==='slime');sim.s.enemies=[e];h.x=e.x+1;h.y=e.y;let hp=h.hp;for(let n=0;n<20;n++)sim.update(.1);assert.equal(h.hp,hp);assert.equal(e.aggroTarget,null);sim.strike(h,e,{power:.01});assert.equal(e.aggroTarget,h.id);sim.update(.1);assert.ok(e.aggroUntil>0);let wolf={...e,type:'wolf',aggression:'aggressive',aggroTarget:null,dead:false,hp:100,aggroUntil:0};sim.s.enemies=[wolf];sim.update(.1);assert.equal(wolf.aggroTarget,h.id)});
-test('weak mobs spawn in clusters and experience expires in outgrown zones',()=>{let sim=new Simulation();sim.s.zone='meadow';sim.populate();assert.ok(sim.s.enemies.filter(e=>e.type==='slime').length>=8);assert.equal(sim.s.enemies.filter(e=>e.type==='wolf').length,1);assert.ok(killXP(1,1)>killXP(8,1));assert.equal(killXP(11,1),0);assert.ok(xpNeeded(60)>xpNeeded(20)*8)});
+test('weak mobs spawn in clusters and experience expires in outgrown zones',()=>{let sim=new Simulation();sim.s.zone='meadow';sim.populate();assert.ok(sim.s.enemies.filter(e=>e.type==='slime').length>=8);assert.equal(sim.s.enemies.filter(e=>e.type==='wolf').length,2);assert.ok(killXP(1,1)>killXP(8,1));assert.equal(killXP(11,1),0);assert.ok(xpNeeded(60)>xpNeeded(20)*8)});
 test('skill training and bar changes enforce ownership, level and persistent cooldown',()=>{let sim=new Simulation(),h=sim.addPlayer('mage','Тест');let third=CLASSES.mage.skills[2];assert.throws(()=>cmd(sim,h.id,'skillUpgrade',{id:third.id}));h.level=8;cmd(sim,h.id,'skillUpgrade',{id:third.id});assert.equal(h.skillRanks[third.id],1);h.cooldowns[third.id]=7;cmd(sim,h.id,'skillAssign',{id:third.id,slot:1});assert.equal(h.skillbar[1],third.id);assert.equal(h.cooldowns[third.id],7);assert.throws(()=>cmd(sim,h.id,'skillAssign',{id:'heal',slot:0}));h.cast={};assert.throws(()=>cmd(sim,h.id,'skillAssign',{id:third.id,slot:0}));});
 test('class sets apply two and three piece bonuses and reject other professions',()=>{let h=makeHero('mage','Тест');h.level=26;let set=SETS['mage-1'],before=derive(h);for(let id of set.pieces){let item=createItem(id,h.id);h.inventory.push(item);assert.ok(equip(h,item.id))}let after=derive(h);assert.ok(after.hp>=before.hp+set.bonuses[2].hp);assert.ok(after.matk>=before.matk+set.bonuses[3].matk);let wrong=createItem(SETS['swordsman-1'].pieces[0],h.id);h.inventory.push(wrong);assert.equal(equip(h,wrong.id),false);assert.ok(recommendedStat(h));});
 test('quest claim is NPC-bound, consumes collectibles and never rewards twice',()=>{let sim=new Simulation(),h=sim.addPlayer('mage','Тест');sim.s.zone='meadow';let npc=ZONES.meadow.objects.find(o=>o.id==='beekeeper');h.x=npc.x+.5;h.y=npc.y+.5;cmd(sim,h.id,'questAccept',{id:'dew-medicine'});assert.throws(()=>cmd(sim,h.id,'questClaim',{id:'dew-medicine'}));for(let n=0;n<5;n++)h.inventory.push(createItem('dew',h.id));let z=h.zeny;cmd(sim,h.id,'questClaim',{id:'dew-medicine'});assert.equal(h.zeny,z+80);assert.equal(h.inventory.filter(i=>i.template==='dew').length,0);assert.throws(()=>cmd(sim,h.id,'questClaim',{id:'dew-medicine'}));});

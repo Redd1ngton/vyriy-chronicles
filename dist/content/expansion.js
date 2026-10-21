@@ -13,5 +13,26 @@ Z.cinder={id:'cinder',name:'Попелясті землі',kind:'forest',levels:
 Z.ice={id:'ice',name:'Перевал останнього світла',kind:'forest',levels:[62,85],size:54,spawn:{x:6,y:42},sight:12,palette:['#89999a','#9cabaa','#b2bfba'],roads:[{x:5,y:8,w:4,h:40},{x:6,y:30,w:41,h:4},{x:24,y:8,w:4,h:26},{x:25,y:8,w:22,h:4},{x:43,y:8,w:4,h:27}],water:[{x:11,y:8,w:10,h:17},{x:11,y:38,w:28,h:12}],walls:[{x:31,y:17,w:7,h:5},{x:15,y:34,w:6,h:2}],houses:[{x:39,y:3,w:5,h:4,art:3,name:'Каплиця останньої варти'}],objects:[portal('ice-home','Назад до Попелястих земель',6,47,'cinder',{x:42,y:33}),npc('lastkeeper','Остання вартова Лада',10,40,'Нава не має власного світла. Вона краде нашу пам’ять. Знайди ім’я останньої варти й зупини того, хто носить її обладунок. Тоді маяк поєднає всі відновлені святині.'),{id:'ice-fire',kind:'camp',name:'Привал за скелями',x:9,y:43,art:12},{id:'ice-name',kind:'relicQuest',name:'Ім’я останньої варти',x:25,y:10,art:11,questItem:'trueName'},beacon('ice-beacon','Маяк Вирію',45,9,'worldLight','Маяк поєднав святині. Шлях від росистих лук до перевалу знову належить живим.'),{id:'ice-chest',kind:'chest',name:'Скарб останньої варти',x:44,y:30,art:9}],enemies:[{type:'slime',level:62,x:11,y:31,count:5},{type:'wolf',level:67,x:25,y:25,count:3},{type:'skeleton',level:73,x:44,y:26,count:2},{type:'dragon',level:78,x:26,y:15,count:1},{type:'warden',level:84,x:45,y:6,count:1}]};
 for(let [id,t]of Object.entries(E)){Object.assign(t,{aggression:['slime','mushroom','dragon','guardian'].includes(id)?'passive':'aggressive',aggroRange:id==='wolf'?4.5:id==='bat'?3.5:id==='warden'?5:4,leash:10});}
 for(let z of Object.values(Z))for(let spawn of z.enemies)spawn.count??=E[spawn.type].level<=3?3:E[spawn.type].level<=6?2:1;
+// Extend around the existing world instead of moving saved heroes, NPCs or quests.
+// Lower crypt corridors stay below the locked altar: no shortcut around its gate.
+for(const z of Object.values(Z)){
+ const oldSize=z.size,end=Math.ceil(oldSize*1.35)-7;
+ const routes=z.id==='crypt'?z.roads.filter(r=>r.y>=oldSize/2):z.roads;
+ const east=routes.reduce((a,b)=>a.x+a.w>b.x+b.w?a:b);
+ const south=routes.reduce((a,b)=>a.y+a.h>b.y+b.h?a:b);
+ const ex=east.x+east.w-1,ey=Math.floor(east.y+east.h/2);
+ const sx=Math.floor(south.x+south.w/2),sy=south.y+south.h-1;
+ z.originalSize=oldSize;z.size=Math.ceil(oldSize*1.35);
+ z.roads.push({x:ex,y:ey-2,w:end-ex+3,h:5},{x:end-2,y:ey,w:5,h:end-ey+3},
+  {x:sx-2,y:sy,w:5,h:end-sy+3},{x:sx,y:end-2,w:end-sx+3,h:5},
+  {x:end-5,y:ey-3,w:10,h:9},{x:sx-3,y:end-5,w:9,h:10});
+ z.objects.push({id:z.id+'-east-cache',kind:'chest',name:z.kind==='dungeon'?'Схованка бічної зали':'Схованка на просторій галявині',x:end,y:ey+2,art:9},
+  {id:z.id+'-south-rest',kind:'camp',name:z.kind==='dungeon'?'Привал у бічній залі':'Привал на дальній стежці',x:sx+2,y:end,art:12});
+ if(z.id!=='village'){
+  const level=z.levels[0];
+  z.enemies.push({type:z.kind==='dungeon'?'bat':'mushroom',level:Math.max(level,3),x:end,y:ey+6,count:2},
+   {type:z.kind==='dungeon'?'skeleton':'wolf',level:Math.max(level+2,4),x:sx+4,y:end-1,count:1});
+ }
+}
 Object.assign(I,{springwater:{name:'Вода першої роси',kind:'quest',icon:'◈',desc:'Для ліків Ярини. Не продається й не передається.',price:0,stats:{},requirements:{level:1}},memorycup:{name:'Чаша пам’яті',kind:'quest',icon:'♜',desc:'Зберігає спогади болотяної святині.',price:0,stats:{},requirements:{level:1}},chronicle:{name:'Втрачений літопис',kind:'quest',icon:'▤',desc:'Сторінки для літописця Северина.',price:0,stats:{},requirements:{level:1}},embers:{name:'Іскра першого горна',kind:'quest',icon:'✦',desc:'Вогонь для рунниці Дарини.',price:0,stats:{},requirements:{level:1}},trueName:{name:'Ім’я останньої варти',kind:'quest',icon:'✧',desc:'Збережене ім’я захисника перевалу.',price:0,stats:{},requirements:{level:1}},sealtoken:{name:'Уламок печатки',kind:'quest',icon:'◇',desc:'Свідчення відновлення Оберегу.',price:0,stats:{},requirements:{level:1}}});
 }

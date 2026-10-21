@@ -33,7 +33,7 @@ const rectContains=(x,y,r)=>x>=r.x&&y>=r.y&&x<r.x+r.w&&y<r.y+r.h;
 const treeHash=(x,y)=>{let v=Math.sin(x*127.1+y*311.7)*43758.5453;return v-Math.floor(v)};
 export function treeAt(zoneId,x,y){let z=ZONES[zoneId];if(z.kind==='dungeon'||x<1||y<1||x>=z.size-1||y>=z.size-1)return false;
 if(z.roads.some(r=>x>=r.x-1&&y>=r.y-1&&x<r.x+r.w+1&&y<r.y+r.h+1)||z.objects.some(o=>Math.hypot(x-o.x,y-o.y)<2)||z.enemies.some(e=>Math.hypot(x-e.x,y-e.y)<1.7)||[...z.water,...z.walls,...z.houses].some(r=>rectContains(x,y,r)))return false;
-return treeHash(x,y)>(z.kind==='forest'?.68:.91);}
+return treeHash(x,y)>(z.kind==='forest'?.82:.96);}
 
 Object.assign(ITEM_TEMPLATES,{herb:{name:'Лісова трава',kind:'material',icon:'❧',price:5,stats:{},requirements:{level:1}},fang:{name:'Звіряче ікло',kind:'material',icon:'▼',price:9,stats:{},requirements:{level:1}},ore:{name:'Оберегова руда',kind:'material',icon:'◈',price:15,stats:{},requirements:{level:1}}});
 
