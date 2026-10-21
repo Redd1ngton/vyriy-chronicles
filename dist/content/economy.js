@@ -9,7 +9,7 @@ export const canTune=(skill,key)=>key!=='crit'||CRIT_KINDS.includes(skill.kind);
 export const tuningCost=(h,id,key)=>TUNING[key]?.costs[tuningRank(h,id,key)]??null;
 export function soulReward(level,boss=false){return boss?3+Math.floor(level/20):1;}
 export const questSoulReward=q=>1+Math.floor(q.level/20);
-export function salePrice(template,item){if(!template||template.bound||template.kind==='quest'||!template.price)return 0;return Math.max(1,Math.floor(template.price*(template.kind==='material'?1:.25)*(1+(item.quality||0)*.12)));}
+export function salePrice(template,item){if(!template||template.bound||item?.bound||template.kind==='quest'||!template.price)return 0;return Math.max(1,Math.floor(template.price*(template.kind==='material'?1:.25)*(1+(item.quality||0)*.12)));}
 export function afterglow(h,skillId){const rank=tuningRank(h,skillId,'afterglow');if(!rank)return null;
  const effects={swordsman:'guard',mage:'might',archer:'evasion',acolyte:'shield',merchant:'guard',thief:'leech',gunslinger:'might'};
  const id=effects[h.classId],duration=id==='evasion'?.3+rank*.2:id==='shield'?2+rank*.6:1.2+rank*.4;
