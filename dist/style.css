@@ -52,3 +52,8 @@
 /* Skill descriptions need readable columns now that each skill has branches. */
 dialog.skill-panel .card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:600px){dialog.skill-panel .card-grid{grid-template-columns:minmax(0,1fr)}}
+
+:fullscreen,#game-shell:fullscreen{background:#152a26;width:100%;height:100%}
+html.game-fullscreen,html.game-fullscreen body{width:100%;height:100%;overflow:hidden}
+@media(max-width:600px){.top-actions{gap:3px}.top-actions button{min-width:33px;min-height:42px}.top-actions button span{font-size:6px}.player-hud{width:190px}.hero-art{width:39px}}
+@media(orientation:landscape) and (pointer:coarse){.hud-top{left:calc(10px + env(safe-area-inset-left,0px));right:calc(10px + env(safe-area-inset-right,0px))}#joystick{right:max(24px,calc(12px + env(safe-area-inset-right,0px)))}.actionbar{left:max(16px,calc(8px + env(safe-area-inset-left,0px)))}.quest-hud{right:env(safe-area-inset-right,0px)}}

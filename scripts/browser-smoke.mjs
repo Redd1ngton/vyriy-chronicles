@@ -32,6 +32,10 @@ for(const [name,type,options] of [
   await page.waitForFunction(()=>document.getElementById('quest-drawer-body').getBoundingClientRect().x>=innerWidth-1);
   const tracker=await page.locator('#quest-drawer-body').boundingBox();
   if(name==='mobile')assert.ok(tracker.x>=380,'Collapsed journal leaves the mobile playfield');
+  await page.locator('#fullscreen-toggle').click();
+  await page.waitForFunction(()=>!!document.fullscreenElement||document.getElementById('modal').open);
+  if(await page.evaluate(()=>!!document.fullscreenElement)){assert.equal(await page.locator('#fullscreen-toggle').getAttribute('aria-pressed'),'true');await page.screenshot({path:'browser-evidence/'+name+'-fullscreen.png'});await page.locator('#fullscreen-toggle').click();await page.waitForFunction(()=>!document.fullscreenElement);}else{assert.ok((await page.locator('#modal-title').textContent()).includes('Горизонтальна'));await page.screenshot({path:'browser-evidence/'+name+'-fullscreen-guide.png'});await page.locator('#modal-close').click();}
+  if(name==='mobile'){await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>innerWidth>innerHeight);const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();assert.ok(joy.x>attack.x+attack.width,'Landscape keeps joystick right and attack left');await page.screenshot({path:'browser-evidence/mobile-landscape.png'});await page.setViewportSize({width:390,height:664});}
   await page.locator('#inventory-open').click();
   await page.locator('#modal[open]').waitFor();
   await page.locator('#modal-close').click();
