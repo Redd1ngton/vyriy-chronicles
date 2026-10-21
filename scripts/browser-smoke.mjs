@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {mkdirSync} from 'node:fs';
 import {chromium,webkit,devices} from 'playwright';
 const origin=process.argv[2];
-if(!origin||!origin.startsWith('https://'))throw Error('HTTPS deployment required');
+if(!origin||(!origin.startsWith('https://')&&origin!=='http://127.0.0.1:4173'))throw Error('HTTPS deployment required');
 mkdirSync('browser-evidence',{recursive:true});
 for(const [name,type,options] of [
  ['desktop',chromium,{viewport:{width:1440,height:900}}],
@@ -21,7 +21,12 @@ for(const [name,type,options] of [
   await page.waitForFunction(()=>!document.getElementById('modal').open);
   await page.locator('#scene canvas').waitFor({state:'visible'});
   await page.waitForFunction(()=>!document.getElementById('hp-value').textContent.includes('undefined')&&document.getElementById('hp-value').textContent.length>0);
+  await page.waitForFunction(()=>document.querySelectorAll('.world-label:not([hidden])').length>0);
+  const labels=await page.locator('.world-label:not([hidden])').evaluateAll(nodes=>nodes.map(el=>({font:parseFloat(getComputedStyle(el).fontSize),transform:getComputedStyle(el).transform})));
+  assert.ok(labels.every(l=>l.font>=12),'World names use readable screen-size text');
+  async function safeHUD(){const geometry=await page.evaluate(()=>{const h=document.getElementById('hero-open').getBoundingClientRect(),xp=document.querySelector('.xp').getBoundingClientRect(),actions=document.querySelector('.top-actions').getBoundingClientRect(),shell=document.getElementById('game-shell').getBoundingClientRect(),v=visualViewport;return{top:h.top,bottom:xp.bottom,right:h.right,actionsLeft:actions.left,shellHeight:shell.height,height:v?.height||innerHeight,offset:v?.offsetTop||0,bodyWidth:document.body.scrollWidth,width:innerWidth};});assert.ok(geometry.top>=geometry.offset,'Vitals below viewport top');assert.ok(geometry.bottom<=geometry.offset+geometry.height,'XP above viewport bottom');assert.ok(geometry.right<=geometry.actionsLeft+1,'Player vitals do not overlap toolbar');assert.ok(Math.abs(geometry.shellHeight-geometry.height)<=1,'Game fits visible Safari viewport');assert.ok(geometry.bodyWidth<=geometry.width+1,'No horizontal page overflow');}
   if(name==='mobile'){
+   await safeHUD();
    const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();
    assert.ok(joy&&attack&&joy.x>attack.x+attack.width,'Right joystick and left attack');
    assert.ok(attack.width>=80,'Large touch attack');
@@ -35,7 +40,7 @@ for(const [name,type,options] of [
   await page.locator('#fullscreen-toggle').click();
   await page.waitForFunction(()=>!!document.fullscreenElement||document.getElementById('modal').open);
   if(await page.evaluate(()=>!!document.fullscreenElement)){assert.equal(await page.locator('#fullscreen-toggle').getAttribute('aria-pressed'),'true');await page.screenshot({path:'browser-evidence/'+name+'-fullscreen.png'});await page.locator('#fullscreen-toggle').click();await page.waitForFunction(()=>!document.fullscreenElement);}else{assert.ok((await page.locator('#modal-title').textContent()).includes('Горизонтальна'));await page.screenshot({path:'browser-evidence/'+name+'-fullscreen-guide.png'});await page.locator('#modal-close').click();}
-  if(name==='mobile'){await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>innerWidth>innerHeight);const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();assert.ok(joy.x>attack.x+attack.width,'Landscape keeps joystick right and attack left');await page.screenshot({path:'browser-evidence/mobile-landscape.png'});await page.setViewportSize({width:390,height:664});}
+  if(name==='mobile'){await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>innerWidth>innerHeight);await page.waitForTimeout(200);await safeHUD();const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();assert.ok(joy.x>attack.x+attack.width,'Landscape keeps joystick right and attack left');await page.screenshot({path:'browser-evidence/mobile-landscape.png'});await page.setViewportSize({width:390,height:664});await page.waitForTimeout(200);await safeHUD();}
   await page.locator('#inventory-open').click();
   await page.locator('#modal[open]').waitFor();
   await page.locator('#modal-close').click();

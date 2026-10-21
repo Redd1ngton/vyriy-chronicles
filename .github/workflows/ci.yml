@@ -17,7 +17,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,7 +41,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -64,7 +64,7 @@ jobs:
   living-world-preview:
     needs: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -80,8 +80,11 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid"' EXIT
           node scripts/browser-living-world.mjs http://127.0.0.1:4173
+          node scripts/browser-smoke.mjs http://127.0.0.1:4173
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: living-world-preview-evidence
-          path: journey-evidence/
+          path: |
+            journey-evidence/
+            browser-evidence/

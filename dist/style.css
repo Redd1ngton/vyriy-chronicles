@@ -68,3 +68,29 @@ html.game-fullscreen,html.game-fullscreen body{width:100%;height:100%;overflow:h
 dialog[open]{display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
 .modal-header{flex:0 0 auto}#modal-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px}
 @media(max-height:520px) and (orientation:landscape){.modal-header{margin-bottom:10px}.modal-header h2{font-size:21px}.modal-header .eyebrow{font-size:7px}}
+
+/* Visible viewport + safe areas keep vitals above Safari chrome in both orientations. */
+html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+#game-shell{position:fixed;top:var(--view-top,0px);left:var(--view-left,0px);width:var(--view-width,100%);height:var(--view-height,100dvh);isolation:isolate}
+#scene{z-index:0}#scene canvas{image-rendering:auto}
+.world-labels{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.world-label{position:absolute;transform:translate(-50%,-100%);max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid #d2c5a455;border-radius:5px;padding:3px 7px;background:#102923f2;color:#fff4d4;font:600 12px/16px system-ui,-apple-system,sans-serif;text-shadow:0 1px 1px #000;box-shadow:0 1px 4px #0005}
+.world-label[data-kind="enemy"]{color:#ffe2cd;border-color:#d49b7655}.world-label[data-kind="ally"]{color:#d9f1db}
+.hud-top{top:calc(12px + env(safe-area-inset-top,0px));left:calc(12px + env(safe-area-inset-left,0px));right:calc(12px + env(safe-area-inset-right,0px));z-index:5}
+.xp{height:5px;border:1px solid #b8a77b55;border-radius:3px}.vital em{font-weight:650;color:#fff;text-shadow:0 1px 2px #000,1px 0 2px #000}
+html.game-focus .location,html.game-focus .controls-hint,html.game-focus #event-log,html.game-focus #save-status{display:none}
+@media(max-width:600px),(pointer:coarse){
+ .hud-top{gap:6px;flex-wrap:nowrap}.player-hud{width:min(206px,calc(100% - 154px));min-width:160px;padding:8px;gap:6px}.hero-art{width:34px;height:48px}.hero-vitals b{font-family:system-ui,-apple-system,sans-serif;font-size:13px;letter-spacing:0;max-width:115px}.hero-vitals small{font-size:9px;white-space:nowrap}.vital{height:13px}.vital em{font-size:9px;line-height:11px}.xp{height:5px}.hero-vitals>span:first-child{margin-bottom:5px}
+ .top-actions{gap:4px;flex-shrink:0}.top-actions button{width:33px;min-width:33px;min-height:43px;font-size:20px}.top-actions button span{font-size:8px;color:#e2e7da}
+ .location{top:calc(88px + env(safe-area-inset-top,0px));max-width:70vw;pointer-events:none}.location h1{font-size:19px}.location>span{font-size:10px}
+ .quest-hud{top:calc(154px + env(safe-area-inset-top,0px))}#status-hud{top:calc(148px + env(safe-area-inset-top,0px))}#target-hud{top:calc(142px + env(safe-area-inset-top,0px))}#mechanic-hud{top:calc(190px + env(safe-area-inset-top,0px))}
+ dialog{max-height:calc(var(--view-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 20px);max-width:calc(var(--view-width,100vw) - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 20px)}
+ .actionbar .action>span{font-size:10px;color:#fff5dc}.utilitybar span{font-size:9px;color:#e2e7da}.quest-hud #quest-objective{font-size:11px;color:#e0e7d4}#quest-drawer-toggle>small{font-size:10px}
+}
+@media(max-height:520px) and (orientation:landscape) and (pointer:coarse){
+ .hud-top{top:calc(8px + env(safe-area-inset-top,0px));left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px))}.player-hud{width:205px}.hero-art{height:42px;width:31px}.location{position:static;margin-top:3px;max-width:35vw;text-align:center}.location>span{display:none}.location h1{font-size:17px}.location p{display:none}
+ .quest-hud{top:calc(94px + env(safe-area-inset-top,0px));right:env(safe-area-inset-right,0px)}#status-hud{top:calc(80px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px))}#target-hud{top:calc(68px + env(safe-area-inset-top,0px))}#mechanic-hud{top:calc(108px + env(safe-area-inset-top,0px))}
+ .world-label{font-size:12px}.utilitybar{bottom:calc(12px + env(safe-area-inset-bottom,0px));right:calc(155px + env(safe-area-inset-right,0px))}
+}
+
+@media(max-width:359px){.player-hud{min-width:138px}.hero-art{display:none}.top-actions{gap:2px}.top-actions button{min-width:31px;width:31px}.hero-vitals b{max-width:91px}}
