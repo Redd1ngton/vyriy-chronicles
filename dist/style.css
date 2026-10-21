@@ -158,3 +158,59 @@ html.game-focus .location,html.game-focus .controls-hint,html.game-focus #event-
 #game-shell[data-mobile="true"][data-layout="landscape"] #status-hud{top:62px;left:180px}
 #game-shell[data-mobile="true"][data-layout="landscape"] #target-hud{top:58px}
 #game-shell[data-mobile="true"][data-layout="landscape"] #mechanic-hud{top:95px}
+
+/* Full-page character selection: all seven classes and actions fit without scrolling. */
+#modal.creating{position:fixed;inset:auto;top:var(--view-top,0px);left:var(--view-left,0px);margin:0;width:var(--view-width,100vw);height:var(--view-height,100dvh);max-width:none;max-height:none;border:0;border-radius:0;padding:calc(14px + env(safe-area-inset-top,0px)) calc(18px + env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) calc(18px + env(safe-area-inset-left,0px));overflow:hidden;container-type:size}
+#modal.creating .modal-header{margin:0 0 8px;padding:0 0 8px}
+#modal.creating .modal-header h2{font-size:clamp(22px,4vw,34px)}
+#modal.creating .modal-header p{margin-bottom:3px;font-size:9px;letter-spacing:2px}
+#modal.creating #modal-close{display:none}
+#modal.creating #modal-body{display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden;padding:0;font-size:12px;line-height:1.4}
+#modal.creating .creation-intro{text-align:center;color:var(--muted)}
+#modal.creating .class-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:8px;margin:0}
+#modal.creating .class-card{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;min-width:0;padding:6px;overflow:hidden}
+#modal.creating .class-card .preview-art{width:min(100%,120px);height:clamp(40px,18vh,160px);min-height:0;flex:0 1 auto;margin:0}
+#modal.creating .class-card b{font-size:clamp(12px,1.8vw,20px);margin-top:2px;line-height:1.2}
+#modal.creating .class-card small{font-size:10px;line-height:1.3;margin-top:3px}
+#modal.creating .creation-summary{display:grid;grid-template-columns:1fr minmax(170px,30%);gap:12px;padding:8px 0 0;align-items:center;flex:none}
+#modal.creating .creation-description p{font-size:12px;margin:3px 0}
+#modal.creating .creation-description small{font-size:10px;color:var(--muted)}
+#modal.creating .creation-name{display:flex;flex-direction:column;gap:3px;font-size:11px}
+#modal.creating .creation-name input{width:100%;min-height:36px;padding:7px 9px;font-size:16px}
+#modal.creating .creation-actions{display:flex;justify-content:center;gap:8px;flex:none}
+#modal.creating .creation-actions .btn{margin:0;min-height:40px;padding:8px 12px;flex:1;max-width:340px;font-size:12px}
+#modal.creating .creation-footnote{text-align:center;font-size:10px;color:var(--muted);margin:0}
+#modal.creating .checkline{font-size:10px;margin:0}
+@container (max-width:600px) and (min-height:360px){
+ #modal.creating #modal-body .class-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:6px}
+ #modal.creating #modal-body .class-card{display:grid;grid-template-columns:42px 1fr;text-align:left;column-gap:6px;padding:4px}
+ #modal.creating #modal-body .class-card .preview-art{width:42px;height:48px;grid-row:1/3}
+ #modal.creating #modal-body .class-card b{font-size:14px;align-self:end}
+ #modal.creating #modal-body .class-card small{font-size:9px;align-self:start}
+ #modal.creating #modal-body .creation-summary{grid-template-columns:1fr;gap:5px;padding-top:6px}
+ #modal.creating #modal-body .creation-description p{font-size:10px}
+ #modal.creating #modal-body .creation-description small{display:none}
+ #modal.creating #modal-body .creation-name{flex-direction:row;align-items:center;gap:8px}
+ #modal.creating #modal-body .creation-name input{flex:1;width:0}
+ #modal.creating #modal-body .creation-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+ #modal.creating #modal-body .creation-actions #start-local{grid-column:1/-1;max-width:none}
+ #modal.creating #modal-body .creation-actions .btn{font-size:11px;padding:5px;min-height:36px}
+ #modal.creating #modal-body .creation-footnote{font-size:9px}
+}
+@container (max-height:350px){
+ #modal.creating .modal-header{margin-bottom:4px;padding-bottom:4px}
+ #modal.creating .modal-header h2{font-size:20px}
+ #modal.creating .modal-header p{display:none}
+ #modal.creating #modal-body{gap:5px!important}
+ #modal.creating #modal-body .creation-intro,#modal.creating #modal-body .class-card small,#modal.creating #modal-body .creation-description small,#modal.creating #modal-body .creation-footnote{display:none}
+ #modal.creating #modal-body .class-grid{gap:5px}
+ #modal.creating #modal-body .class-card{padding:3px}
+ #modal.creating #modal-body .class-card .preview-art{height:40px;width:40px;flex:none}
+ #modal.creating #modal-body .class-card b{font-size:12px}
+ #modal.creating #modal-body .creation-summary{padding-top:4px;gap:8px}
+ #modal.creating #modal-body .creation-description p{font-size:10px;margin:1px 0}
+ #modal.creating #modal-body .creation-name{font-size:10px}
+ #modal.creating #modal-body .creation-name input{min-height:30px;padding:4px 8px}
+ #modal.creating #modal-body .creation-actions .btn{min-height:32px;padding:4px 8px;font-size:11px}
+}
+#game-shell{touch-action:none}#modal:not(.creating){touch-action:pan-y}

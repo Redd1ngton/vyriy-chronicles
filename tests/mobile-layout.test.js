@@ -7,9 +7,16 @@ test('world names remain screen-sized, snap to pixels and avoid collisions and H
 
 test('stale portrait visualViewport after rotation uses current landscape window until WebKit catches up',()=>{assert.deepEqual(viewportBox({innerWidth:844,innerHeight:390,visualViewport:{width:390,height:844,offsetTop:0,offsetLeft:0,scale:1}}),{width:844,height:390,top:0,left:0});assert.equal(viewportBox({innerWidth:390,innerHeight:844,visualViewport:{width:390,height:620,offsetTop:0,scale:1}}).height,620);});
 
-import {mobileLayout} from '../dist/ui/mobile-layout.js';
-test('mobile camera backs away and adapts to Safari landscape chrome without changing desktop',()=>{
- assert.equal(mobileLayout({width:390,height:664,coarse:true}).zoom,.62);
- for(const height of [244,293,390]){const v=mobileLayout({width:844,height,coarse:true});assert.equal(v.layout,'landscape');assert.ok(v.zoom<=.62);assert.ok(height/v.zoom>=580,'At least 580 world pixels remain visible vertically');}
+import {mobileLayout,installCameraLock} from '../dist/ui/mobile-layout.js';
+test('camera distance stays fixed across rotation and Safari toolbar changes',()=>{
+ for(const [width,height] of [[390,664],[390,844],[844,244],[844,293],[844,390],[320,568]])assert.equal(mobileLayout({width,height,coarse:true}).zoom,.5);
  assert.equal(mobileLayout({width:1440,height:900}).zoom,1.1);
+});
+
+test('camera gesture lock blocks pinch and Ctrl-wheel without blocking ordinary touch movement',()=>{
+ const listeners={};installCameraLock({addEventListener(n,fn){listeners[n]=fn}});
+ const event=extra=>({cancelable:true,preventDefault(){this.prevented=true},...extra});
+ for(const name of ['gesturestart','gesturechange','gestureend']){const e=event({});listeners[name](e);assert.equal(e.prevented,true);}
+ for(const extra of [{touches:[{},{}]},{ctrlKey:true}]){const e=event(extra);listeners[extra.ctrlKey?'wheel':'touchmove'](e);assert.equal(e.prevented,true);}
+ const e=event({touches:[{}]});listeners.touchmove(e);assert.equal(e.prevented,undefined);
 });

@@ -53,3 +53,5 @@ import {installJourneys} from './journeys.js?v=0.6.0';
 installJourneys(ZONES,ITEM_TEMPLATES);
 import {installLivingWorld} from './living-world.js?v=0.8.0';
 installLivingWorld(ZONES,ENEMIES,ITEM_TEMPLATES);
+import {installTrials} from './trials.js?v=0.9.0';
+installTrials(ITEM_TEMPLATES);

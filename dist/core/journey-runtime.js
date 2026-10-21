@@ -1,3 +1,4 @@
+import {trialChoices,TRIALS} from '../content/trials.js?v=0.9.0';
 import {killXP} from '../content/progression.js?v=0.3.1';
 import {RELICS,ROUTES,INCIDENTS,relicChoices,activeRelic} from '../content/journeys.js?v=0.6.0';
 import {DUNGEONS,makeElite} from '../content/adventures.js?v=0.3.1';
@@ -30,7 +31,7 @@ export function dungeonChoices(sim,enemy,nearby) {
  for(let h of nearby){
   // The caller already limits participation to living players near the boss.
   if(killXP(h.level,enemy.level,true,enemy.type)<=0)continue;
-  h.dungeonRewards??=[];h.dungeonRewards.push({id:uid(),runId:run.id,zone:sim.s.zone,level:enemy.level,route:run.route||'safe',choices:['resources',...relicChoices(h.classId)]});
+  h.dungeonRewards??=[];h.dungeonRewards.push({id:uid(),runId:run.id,zone:sim.s.zone,level:enemy.level,route:run.route||'safe',trial:run.trial||0,choices:run.trial?trialChoices(h.classId):['resources',...relicChoices(h.classId)]});
   if(run.route==='risky'){h.echoes+=2;shards(h,2);h.zeny+=300+enemy.level*10;}
   sim.event('dungeonReward',{actor:h.id,text:'Оберіть одну з трьох нагород експедиції. Вибір збережено до отримання.'});
  }
@@ -39,8 +40,8 @@ function claimedChoice(sim,h,i){
  const reward=h.dungeonRewards?.find(r=>r.id===i.id);if(!reward||!reward.choices.includes(i.choice))throw Error('Ця нагорода вже отримана або вибір недоступний');
  const atBoss=sim.s.dungeonRun?.id===reward.runId&&sim.s.dungeonRun.status==='completed'&&sim.s.enemies.some(e=>e.boss&&dist(h,e)<14);
  if(!atBoss&&!near(sim,h,['camp','storage']))throw Error('Заберіть нагороду біля боса, привалу або скрині сховища');
- if(i.choice==='resources'){shards(h,reward.route==='risky'?6:4);h.echoes+=reward.route==='risky'?4:3;h.zeny+=400+reward.level*10;}else h.inventory.push(createItem(i.choice,h.id));
- h.dungeonRewards=h.dungeonRewards.filter(r=>r.id!==reward.id);sim.event('loot',{actor:h.id,text:i.choice==='resources'?'Ресурси експедиції отримано':'Реліквія отримана: '+ITEM_TEMPLATES[i.choice].name});return{};
+ if(i.choice==='trial-resources'){shards(h,8+reward.trial*2);h.echoes+=5+reward.trial*2;h.zeny+=800+reward.level*15;}else if(i.choice==='resources'){shards(h,reward.route==='risky'?6:4);h.echoes+=reward.route==='risky'?4:3;h.zeny+=400+reward.level*10;}else h.inventory.push(createItem(i.choice,h.id));
+ h.dungeonRewards=h.dungeonRewards.filter(r=>r.id!==reward.id);sim.event('loot',{actor:h.id,text:['resources','trial-resources'].includes(i.choice)?'Ресурси експедиції отримано':'Реліквія отримана: '+ITEM_TEMPLATES[i.choice].name});return{};
 }
 function store(sim,h,i){
  if(!near(sim,h,['storage']))throw Error('Підійдіть до скрині мандрівника');h.storage??=[];

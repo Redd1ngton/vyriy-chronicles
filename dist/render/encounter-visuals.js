@@ -8,6 +8,7 @@ export class EncounterVisuals {
   if(s.zone==='village'){const a=p(13.5,33.5),home=h.homestead;label('home',a.x,a.y-65,'Садиба · '+((home?.garden||0)+(home?.workshop||0)+(home?.hall||0))+'/9');for(let i=0;i<(home?.trophies?.length||0);i++)g.fillStyle(0xd8b877,.9).fillCircle(a.x-20+i*20,a.y-20,6);}
   for(const f of s.fields||[]){const a=p(f.x,f.y),color={guardField:0xb7d6a1,healField:0xc9e8ac,frostField:0x91d3ed,emberField:0xeeb16d,thornField:0xa1c67d}[f.kind]||0xdfc489;g.fillStyle(color,.14).fillEllipse(a.x,a.y,f.radius*64,f.radius*32);g.lineStyle(2,color,.8).strokeEllipse(a.x,a.y,f.radius*64,f.radius*32);}
   for(const o of s.encounterObjects||[]){if(Math.hypot(o.x-h.x,o.y-h.y)>22)continue;const a=p(o.x,o.y);
+   if(o.kind==='trialTrap'){g.lineStyle(2,0xe4b35d,.6).strokeEllipse(a.x,a.y,70,35);g.lineBetween(a.x-10,a.y-5,a.x,a.y+5);g.lineBetween(a.x,a.y+5,a.x+12,a.y-7);}
    if(o.kind==='cover'){g.fillStyle(0xa7d7e7,.9).fillPoints([{x:a.x-12,y:a.y},{x:a.x-8,y:a.y-55},{x:a.x+2,y:a.y-75},{x:a.x+16,y:a.y-43},{x:a.x+13,y:a.y+3}],true);g.lineStyle(2,0xe0f7ff,.95).lineBetween(a.x+2,a.y-75,a.x+2,a.y-3);label(o.id,a.x,a.y+19,'Укриття','#c2edfc');}
    if(o.kind==='challengeChest'){propIds.add(o.id);let prop=this.props.get(o.id);if(!prop){prop=scene.add.image(a.x,a.y,'world',9).setOrigin(.5,.85).setDisplaySize(85,85);this.props.set(o.id,prop);}prop.setPosition(a.x,a.y).setDepth(a.y);const claimed=s.dungeonRun?.bonusClaims?.includes(h.id);prop.setAlpha(claimed?.45:1);label(o.id,a.x,a.y+20,claimed?'Скриню відкрито':'Скриня східного склепу');}
   }

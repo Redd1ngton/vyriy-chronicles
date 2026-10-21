@@ -18,6 +18,18 @@ for(const [name,type,options] of [
   await page.goto(origin+'/?check=0.3.2',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>document.getElementById('startup').hidden,{timeout:40000});
   assert.equal(await page.evaluate(()=>typeof window.Phaser?.Game),'function');
+  async function checkCreation(){
+   const geometry=await page.evaluate(()=>{const m=document.getElementById('modal'),body=document.getElementById('modal-body'),r=m.getBoundingClientRect();return{width:r.width,height:r.height,scroll:body.scrollHeight-body.clientHeight,viewWidth:visualViewport.width,viewHeight:visualViewport.height,items:[...document.querySelectorAll('.class-card,#character-name,.creation-actions button')].map(e=>{const b=e.getBoundingClientRect();return{id:e.dataset.class||e.id,x:b.x,y:b.y,right:b.right,bottom:b.bottom,width:b.width,height:b.height}})}});
+   assert.ok(Math.abs(geometry.width-geometry.viewWidth)<2&&Math.abs(geometry.height-geometry.viewHeight)<2,'Start menu fills visible viewport');
+   assert.ok(geometry.scroll<=1,'Start menu needs no scrolling: '+JSON.stringify(geometry));assert.equal(await page.locator('.class-card').count(),7);
+   for(const b of geometry.items)assert.ok(b.width>0&&b.height>=28&&b.x>=0&&b.y>=0&&b.right<=geometry.width+1&&b.bottom<=geometry.height+1,'Start menu control fits: '+JSON.stringify(b));
+  }
+  if(name==='mobile'){
+   for(const [width,height]of [[390,664],[320,568],[844,390],[844,244]]){await page.setViewportSize({width,height});await page.waitForTimeout(200);await checkCreation();await page.screenshot({path:'browser-evidence/start-'+width+'x'+height+'.png'});}
+   await page.setViewportSize({width:390,height:844});await page.waitForTimeout(200);
+  }
+  await checkCreation();
+  for(const card of await page.locator('.class-card').all()){await card.click();assert.equal(await card.getAttribute('aria-pressed'),'true');}
   await page.locator('#start-local').click();
   await page.waitForFunction(()=>!document.getElementById('modal').open);
   await page.locator('#scene canvas').waitFor({state:'visible'});
@@ -48,6 +60,7 @@ for(const [name,type,options] of [
     const overlap=(a,b)=>Math.min(a.right,b.right)-Math.max(a.x,b.x)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)>1;
     for(const c of geometry.controls){assert.ok(c.x>=geometry.shell.x&&c.y>=geometry.shell.y&&c.right<=geometry.shell.right+1&&c.bottom<=geometry.shell.bottom+1,'Control inside visible game '+width+'x'+height+': '+JSON.stringify(c));}
     for(let i=0;i<geometry.controls.length;i++)for(let j=i+1;j<geometry.controls.length;j++)assert.ok(!overlap(geometry.controls[i],geometry.controls[j]),'Controls do not overlap '+width+'x'+height+': '+geometry.controls[i].id+'/'+geometry.controls[j].id);
+    assert.equal(await page.locator('#scene canvas').getAttribute('data-camera-zoom'),'0.5','Camera zoom stays locked across viewport changes');
     const attack=geometry.controls.find(c=>c.id==='attack'),joy=geometry.controls.find(c=>c.id==='joystick');assert.ok(joy.x>attack.right,'Joystick stays right');
     let fraction=sceneColorFraction(await page.locator('#scene canvas').screenshot());
     if(fraction<.15){await page.waitForTimeout(1200);fraction=sceneColorFraction(await page.locator('#scene canvas').screenshot());}

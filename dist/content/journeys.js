@@ -32,7 +32,7 @@ export const RELICS = {
 export const relicChoices = classId => RELICS[classId].map(r=>'relic-'+r.id);
 export function activeRelic(h) {
  const item=h.inventory?.find(i=>i.id===h.equipment?.accessory);
- return item ? RELICS[h.classId]?.find(r=>'relic-'+r.id===item.template) : null;
+ return item ? RELICS[h.classId]?.find(r=>('relic-'+r.id===item.template||'trial-relic-'+r.id===item.template)) : null;
 }
 export const ROUTES={
  safe:{name:'Західний обхід',desc:'Північна стежка через західну галерею. Три вартові, звичайна сила ворогів.',multiplier:1},
