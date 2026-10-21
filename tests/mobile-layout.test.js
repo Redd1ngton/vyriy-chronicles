@@ -24,3 +24,8 @@ test('camera gesture lock blocks pinch and Ctrl-wheel without blocking ordinary 
 test('a previously wider top-layer menu cannot keep Safari viewport stuck after a narrower resize',()=>{
  assert.deepEqual(viewportBox({innerWidth:390,innerHeight:664,document:{documentElement:{clientWidth:320}},visualViewport:{width:320,height:568,offsetTop:0,offsetLeft:0,scale:1}}),{width:320,height:568,top:0,left:0});
 });
+
+test('top-layer start dialog receives viewport sizes directly when Safari changes orientation',()=>{
+ const listeners={},values={},modalValues={},style=dest=>({setProperty(k,v){dest[k]=v}}),visual={width:390,height:664,offsetTop:0,offsetLeft:0,addEventListener(n,f){listeners[n]=f},removeEventListener(){}},win={innerWidth:390,innerHeight:664,visualViewport:visual,addEventListener(){},removeEventListener(){},requestAnimationFrame(f){f();return 1},cancelAnimationFrame(){}};
+ const viewport=installViewport({win,shell:{style:style(values),querySelector(){return{style:style(modalValues)}}}});assert.equal(modalValues['--view-width'],'390px');win.innerWidth=visual.width=320;win.innerHeight=visual.height=568;listeners.resize();assert.equal(values['--view-width'],'320px');assert.equal(modalValues['--view-width'],'320px');assert.equal(modalValues['--view-height'],'568px');viewport.destroy();
+});
