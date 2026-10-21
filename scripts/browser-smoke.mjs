@@ -20,7 +20,7 @@ for(const [name,type,options] of [
   assert.equal(await page.evaluate(()=>typeof window.Phaser?.Game),'function');
   async function checkCreation(){
    const geometry=await page.evaluate(()=>{const m=document.getElementById('modal'),body=document.getElementById('modal-body'),r=m.getBoundingClientRect();return{width:r.width,height:r.height,scroll:body.scrollHeight-body.clientHeight,viewWidth:visualViewport.width,viewHeight:visualViewport.height,items:[...document.querySelectorAll('.class-card,#character-name,.creation-actions button')].map(e=>{const b=e.getBoundingClientRect();return{id:e.dataset.class||e.id,x:b.x,y:b.y,right:b.right,bottom:b.bottom,width:b.width,height:b.height}})}});
-   assert.ok(Math.abs(geometry.width-geometry.viewWidth)<2&&Math.abs(geometry.height-geometry.viewHeight)<2,'Start menu fills visible viewport');
+   assert.ok(Math.abs(geometry.width-geometry.viewWidth)<2&&Math.abs(geometry.height-geometry.viewHeight)<2,'Start menu fills visible viewport: '+JSON.stringify(geometry));
    assert.ok(geometry.scroll<=1,'Start menu needs no scrolling: '+JSON.stringify(geometry));assert.equal(await page.locator('.class-card').count(),7);
    for(const b of geometry.items)assert.ok(b.width>0&&b.height>=28&&b.x>=0&&b.y>=0&&b.right<=geometry.width+1&&b.bottom<=geometry.height+1,'Start menu control fits: '+JSON.stringify(b));
   }

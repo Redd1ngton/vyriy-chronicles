@@ -213,4 +213,4 @@ html.game-focus .location,html.game-focus .controls-hint,html.game-focus #event-
  #modal.creating #modal-body .creation-name input{min-height:30px;padding:4px 8px}
  #modal.creating #modal-body .creation-actions .btn{min-height:32px;padding:4px 8px;font-size:11px}
 }
-#game-shell{touch-action:none}#modal:not(.creating){touch-action:pan-y}
+#game-shell{touch-action:manipulation}#modal.creating{touch-action:none}#modal:not(.creating),#modal:not(.creating) #modal-body{touch-action:pan-y}

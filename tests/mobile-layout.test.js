@@ -20,3 +20,7 @@ test('camera gesture lock blocks pinch and Ctrl-wheel without blocking ordinary 
  for(const extra of [{touches:[{},{}]},{ctrlKey:true}]){const e=event(extra);listeners[extra.ctrlKey?'wheel':'touchmove'](e);assert.equal(e.prevented,true);}
  const e=event({touches:[{}]});listeners.touchmove(e);assert.equal(e.prevented,undefined);
 });
+
+test('a previously wider top-layer menu cannot keep Safari viewport stuck after a narrower resize',()=>{
+ assert.deepEqual(viewportBox({innerWidth:390,innerHeight:664,document:{documentElement:{clientWidth:320}},visualViewport:{width:320,height:568,offsetTop:0,offsetLeft:0,scale:1}}),{width:320,height:568,top:0,left:0});
+});
