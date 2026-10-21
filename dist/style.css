@@ -47,3 +47,8 @@
 @media(max-width:600px){.quest-hud{top:155px;right:0;width:210px}#quest-drawer-body{max-height:calc(100dvh - 370px)}#quest-open{padding:11px 13px}#target-hud{top:143px;left:auto;right:12px;transform:none;width:175px;padding:6px 8px;font-size:9px}#target-hud small{display:none}}
 @media(max-height:520px) and (orientation:landscape){.quest-hud{top:100px;right:0;width:210px}#quest-drawer-body{max-height:calc(100dvh - 150px)}#target-hud{top:70px;left:50%;right:auto;transform:translateX(-50%);width:180px;padding:5px 8px;font-size:9px}#target-hud small{display:none}}
 @media(prefers-reduced-motion:reduce){.quest-hud{transition:none}}
+
+@media(max-width:600px){#target-hud{right:58px}}
+/* Skill descriptions need readable columns now that each skill has branches. */
+dialog.skill-panel .card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:600px){dialog.skill-panel .card-grid{grid-template-columns:minmax(0,1fr)}}
