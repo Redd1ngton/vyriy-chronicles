@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {sceneColorFraction} from './scene-pixels.mjs';
 import {mkdirSync} from 'node:fs';
 import {chromium,webkit,devices} from 'playwright';
 const origin=process.argv[2];
@@ -48,6 +49,9 @@ for(const [name,type,options] of [
     for(const c of geometry.controls){assert.ok(c.x>=geometry.shell.x&&c.y>=geometry.shell.y&&c.right<=geometry.shell.right+1&&c.bottom<=geometry.shell.bottom+1,'Control inside visible game '+width+'x'+height+': '+JSON.stringify(c));}
     for(let i=0;i<geometry.controls.length;i++)for(let j=i+1;j<geometry.controls.length;j++)assert.ok(!overlap(geometry.controls[i],geometry.controls[j]),'Controls do not overlap '+width+'x'+height+': '+geometry.controls[i].id+'/'+geometry.controls[j].id);
     const attack=geometry.controls.find(c=>c.id==='attack'),joy=geometry.controls.find(c=>c.id==='joystick');assert.ok(joy.x>attack.right,'Joystick stays right');
+    let fraction=sceneColorFraction(await page.locator('#scene canvas').screenshot());
+    if(fraction<.15){await page.waitForTimeout(1200);fraction=sceneColorFraction(await page.locator('#scene canvas').screenshot());}
+    assert.ok(fraction>.15,'World remains rendered after rotation '+width+'x'+height+': '+fraction);
     await page.screenshot({path:'browser-evidence/mobile-'+width+'x'+height+'.png'});
    }
    await page.setViewportSize({width:390,height:664});await page.waitForTimeout(200);
