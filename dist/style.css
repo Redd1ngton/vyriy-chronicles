@@ -27,3 +27,7 @@
 }
 @media(max-height:520px) and (orientation:landscape) and (pointer:coarse){.utilitybar{bottom:14px;right:160px}#event-log{display:none}.quest-hud{top:88px;right:160px;width:180px}#joystick{bottom:24px}.actionbar{bottom:15px}.actionbar #interact{bottom:155px}}
 @media(max-width:360px){.actionbar{left:8px;width:180px}.actionbar #attack{width:80px;height:80px}.actionbar .action{width:56px;height:56px}.actionbar #skill0{bottom:94px}.actionbar #skill1{left:64px;bottom:83px}.actionbar #potion{left:100px;bottom:25px}#joystick{right:12px;width:100px;height:100px}#joy-knob{left:31px;top:31px}.actionbar #interact{right:12px}.utilitybar{right:12px}}
+
+.legendary-reward{padding:14px;border:1px solid #e7bc7266;border-radius:10px;background:#c99b4b12;color:#f0cd88;line-height:1.7}
+
+.soul-tuning{margin-top:14px;border-top:1px solid #bda5e644;padding-top:10px}.soul-tuning h4{color:#d6b7f4;margin:0 0 8px}.soul-option{padding:10px;margin:8px 0;background:#b792df0a;border-radius:8px}.soul-option p{font-size:12px;line-height:1.55}.soul-option small{display:block;margin-top:6px;color:var(--muted)}

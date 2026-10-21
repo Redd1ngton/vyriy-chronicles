@@ -42,3 +42,6 @@ expandWorld(ZONES,ENEMIES,ITEM_TEMPLATES);
 REGION.zones=Object.keys(ZONES);
 import {installEquipment} from './progression.js?v=0.3.1';
 installEquipment(ITEM_TEMPLATES);
+import {installChapterTwo} from './chapter2.js?v=0.3.1';
+installChapterTwo(ZONES,ENEMIES,ITEM_TEMPLATES);
+REGION.zones=Object.keys(ZONES);

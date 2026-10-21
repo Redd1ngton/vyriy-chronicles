@@ -29,6 +29,8 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: Play the deployed game in desktop Chromium and mobile WebKit
         run: node scripts/browser-smoke.mjs https://vyriy.lepra-soa.workers.dev
+      - name: Check seasonal regions, bosses, inventory sales and soul tuning in isolated saves
+        run: node scripts/browser-expansion.mjs https://vyriy.lepra-soa.workers.dev
       - uses: actions/upload-artifact@v4
         if: always()
         with:

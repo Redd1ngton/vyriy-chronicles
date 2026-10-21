@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {inflateSync} from 'node:zlib';
 import assert from 'node:assert/strict';
-const names=['heroes-v2.png','heroes-extra-v2.png','world-v2.png','enemies-v2.png','bosses-v2.png'];
+const names=['heroes-v2.png','heroes-extra-v2.png','world-v2.png','enemies-v2.png','bosses-v2.png','frontier-creatures-v1.png','seasons-scenery-v1.png'];
 function crc32(b){let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
 const failures=[];
 for(const name of names){try{
@@ -16,7 +16,7 @@ for(const name of names){try{
   pos+=n+12;if(type==='IEND'){assert.equal(n,0);ended=true;break;}
  }
  assert.ok(ended,'missing IEND');assert.equal(pos,b.length,'trailing bytes');
- assert.equal(width,1254);assert.equal(height,1254);assert.equal(depth,8);
+ assert.equal(width,name==='frontier-creatures-v1.png'?1536:1254);assert.equal(height,name==='frontier-creatures-v1.png'?1024:1254);assert.equal(depth,8);
  const channels={0:1,2:3,3:1,4:2,6:4}[color];assert.ok(channels,'unsupported color type');
  const raw=inflateSync(Buffer.concat(parts)),stride=width*channels+1;assert.equal(raw.length,height*stride,'incomplete pixel data');
  for(let y=0;y<height;y++)assert.ok(raw[y*stride]<=4,'invalid scanline filter');

@@ -44,7 +44,7 @@ test('rosynka XP reflects its easier combat and falls off before it becomes a fa
  assert.equal(killXP(1,1,true,'slime'),68);
 });
 test('expanded locations offer reachable space beyond their old borders and preserve saved progress',()=>{
- for(const z of Object.values(ZONES)){
+ for(const z of Object.values(ZONES).filter(z=>z.originalSize)){
   assert.ok(z.size>=z.originalSize*1.35);
   const cache=z.objects.find(o=>o.id===z.id+'-east-cache');
   assert.ok(cache.x>z.originalSize);assert.ok(pathfind(z.id,z.spawn,cache).length, z.id+' expanded route');
