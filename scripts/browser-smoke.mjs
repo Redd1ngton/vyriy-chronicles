@@ -29,7 +29,7 @@ for(const [name,type,options] of [
    await safeHUD();
    const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();
    assert.ok(joy&&attack&&joy.x>attack.x+attack.width,'Right joystick and left attack');
-   assert.ok(attack.width>=80,'Large touch attack');
+   assert.ok(attack.width>=64&&attack.width<=76,'Compact usable touch attack');
   }
   assert.equal(await page.locator('#quest-drawer-toggle').getAttribute('aria-expanded'),'false');
   await page.locator('#quest-drawer-toggle').click();assert.equal(await page.locator('#quest-drawer-toggle').getAttribute('aria-expanded'),'true');
@@ -40,7 +40,18 @@ for(const [name,type,options] of [
   await page.locator('#fullscreen-toggle').click();
   await page.waitForFunction(()=>!!document.fullscreenElement||document.getElementById('modal').open);
   if(await page.evaluate(()=>!!document.fullscreenElement)){assert.equal(await page.locator('#fullscreen-toggle').getAttribute('aria-pressed'),'true');await page.screenshot({path:'browser-evidence/'+name+'-fullscreen.png'});await page.locator('#fullscreen-toggle').click();await page.waitForFunction(()=>!document.fullscreenElement);}else{assert.ok((await page.locator('#modal-title').textContent()).includes('Горизонтальна'));await page.screenshot({path:'browser-evidence/'+name+'-fullscreen-guide.png'});await page.locator('#modal-close').click();}
-  if(name==='mobile'){await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>innerWidth>innerHeight);await page.waitForTimeout(200);await safeHUD();const joy=await page.locator('#joystick').boundingBox(),attack=await page.locator('#attack').boundingBox();assert.ok(joy.x>attack.x+attack.width,'Landscape keeps joystick right and attack left');await page.screenshot({path:'browser-evidence/mobile-landscape.png'});await page.setViewportSize({width:390,height:664});await page.waitForTimeout(200);await safeHUD();}
+  if(name==='mobile'){
+   for(const [width,height] of [[844,390],[844,293],[844,244],[390,664],[320,568]]){
+    await page.setViewportSize({width,height});await page.waitForTimeout(250);await safeHUD();
+    const geometry=await page.evaluate(()=>{const box=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height}},shell=box(document.getElementById('game-shell'));return {shell,controls:['attack','skill0','skill1','potion','interact','joystick','hero-open','fullscreen-toggle','world-map','coop-open','menu-open','inventory-open','spec-open','help-open'].map(id=>({id,...box(document.getElementById(id))}))};});
+    const overlap=(a,b)=>Math.min(a.right,b.right)-Math.max(a.x,b.x)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)>1;
+    for(const c of geometry.controls){assert.ok(c.x>=geometry.shell.x&&c.y>=geometry.shell.y&&c.right<=geometry.shell.right+1&&c.bottom<=geometry.shell.bottom+1,'Control inside visible game '+width+'x'+height+': '+JSON.stringify(c));}
+    for(let i=0;i<geometry.controls.length;i++)for(let j=i+1;j<geometry.controls.length;j++)assert.ok(!overlap(geometry.controls[i],geometry.controls[j]),'Controls do not overlap '+width+'x'+height+': '+geometry.controls[i].id+'/'+geometry.controls[j].id);
+    const attack=geometry.controls.find(c=>c.id==='attack'),joy=geometry.controls.find(c=>c.id==='joystick');assert.ok(joy.x>attack.right,'Joystick stays right');
+    await page.screenshot({path:'browser-evidence/mobile-'+width+'x'+height+'.png'});
+   }
+   await page.setViewportSize({width:390,height:664});await page.waitForTimeout(200);
+  }
   await page.locator('#inventory-open').click();
   await page.locator('#modal[open]').waitFor();
   await page.locator('#modal-close').click();

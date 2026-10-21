@@ -94,3 +94,67 @@ html.game-focus .location,html.game-focus .controls-hint,html.game-focus #event-
 }
 
 @media(max-width:359px){.player-hud{min-width:138px}.hero-art{display:none}.top-actions{gap:2px}.top-actions button{min-width:31px;width:31px}.hero-vitals b{max-width:91px}}
+
+/* Mobile geometry follows the visible game surface, including expanded Safari bars. */
+#game-shell[data-mobile="true"] .hud-top{top:calc(8px + env(safe-area-inset-top,0px));left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));gap:6px;flex-wrap:nowrap}
+#game-shell[data-mobile="true"] .player-hud{width:174px;min-width:138px;padding:6px;gap:5px;flex-shrink:1}
+#game-shell[data-mobile="true"] .hero-art{display:block;width:26px;height:36px}
+#game-shell[data-mobile="true"] .hero-vitals b{font-size:12px;max-width:100px}
+#game-shell[data-mobile="true"] .hero-vitals small{font-size:8px}
+#game-shell[data-mobile="true"] .hero-vitals>span:first-child{margin-bottom:3px}
+#game-shell[data-mobile="true"] .vital{height:11px;margin-bottom:3px}
+#game-shell[data-mobile="true"] .vital em{font-size:9px;line-height:9px}
+#game-shell[data-mobile="true"] .xp{height:3px}
+#game-shell[data-mobile="true"] .top-actions{gap:3px}
+#game-shell[data-mobile="true"] .top-actions button{min-width:30px;width:30px;min-height:36px;padding:2px;font-size:18px}
+#game-shell[data-mobile="true"] .top-actions button span{font-size:7px}
+#game-shell[data-mobile="true"] .location{position:absolute;top:68px;left:0;text-align:left;margin:0;max-width:55%;min-width:0}
+#game-shell[data-mobile="true"] .location h1{font-size:17px}
+#game-shell[data-mobile="true"] .location p,#game-shell[data-mobile="true"] .location>span{display:none}
+#game-shell[data-mobile="true"] .actionbar{left:calc(10px + env(safe-area-inset-left,0px));right:auto;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:166px;height:150px;padding:0;transform:none;background:none;border:0;box-shadow:none;display:block;pointer-events:none}
+#game-shell[data-mobile="true"] .actionbar .action{position:absolute;width:48px;height:48px;max-width:none;border-radius:50%;gap:1px;pointer-events:auto}
+#game-shell[data-mobile="true"] .actionbar .action b{font-size:21px}
+#game-shell[data-mobile="true"] .actionbar .action>span{font-size:8px;line-height:1.1;padding:0 2px}
+#game-shell[data-mobile="true"] .actionbar .action kbd,#game-shell[data-mobile="true"]>#interact kbd{display:none}
+#game-shell[data-mobile="true"] .actionbar #attack{left:4px;bottom:0;width:76px;height:76px}
+#game-shell[data-mobile="true"] .actionbar #attack b{font-size:30px}
+#game-shell[data-mobile="true"] .actionbar #attack>span{font-size:10px}
+#game-shell[data-mobile="true"] .actionbar #skill0{left:0;bottom:90px}
+#game-shell[data-mobile="true"] .actionbar #skill1{left:56px;bottom:80px}
+#game-shell[data-mobile="true"] .actionbar #potion{left:88px;bottom:16px}
+#game-shell[data-mobile="true"] #joystick{display:block;left:auto;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));width:88px;height:88px}
+#game-shell[data-mobile="true"] #joy-knob{width:32px;height:32px;left:27px;top:27px}
+#game-shell[data-mobile="true"]>#interact{position:absolute;left:auto;right:calc(34px + env(safe-area-inset-right,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;gap:1px;z-index:4}
+#game-shell[data-mobile="true"]>#interact b{font-size:23px}
+#game-shell[data-mobile="true"]>#interact>span{font-size:8px}
+#game-shell[data-mobile="true"] .utilitybar{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(196px + env(safe-area-inset-bottom,0px));gap:4px}
+#game-shell[data-mobile="true"] .utilitybar button{min-width:38px;height:38px;padding:2px;font-size:17px}
+#game-shell[data-mobile="true"] .utilitybar span{font-size:8px}
+#game-shell[data-mobile="true"] .quest-hud{top:110px;right:0;width:190px}
+#game-shell[data-mobile="true"] #quest-drawer-toggle{left:-34px;width:34px;min-height:44px;padding:4px 1px}
+#game-shell[data-mobile="true"] #quest-drawer-toggle>span{font-size:18px}
+#game-shell[data-mobile="true"] #quest-drawer-toggle>small{font-size:8px}
+#game-shell[data-mobile="true"] #quest-drawer-body{max-height:calc(var(--view-height) - 180px)}
+#game-shell[data-mobile="true"] #status-hud{top:100px}
+#game-shell[data-mobile="true"] #target-hud{top:96px;max-width:170px}
+#game-shell[data-mobile="true"] #save-status,#game-shell[data-mobile="true"] #event-log{display:none}
+#game-shell[data-mobile="true"][data-layout="landscape"] .player-hud{width:158px;min-width:158px;padding:4px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .hero-art{width:23px;height:32px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .location{display:none}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar{height:132px;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:154px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar .action{width:44px;height:44px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar #attack{width:64px;height:64px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar #skill0{left:0;bottom:80px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar #skill1{left:52px;bottom:70px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .actionbar #potion{left:76px;bottom:8px}
+#game-shell[data-mobile="true"][data-layout="landscape"] #joystick{width:80px;height:80px;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+#game-shell[data-mobile="true"][data-layout="landscape"] #joy-knob{left:23px;top:23px}
+#game-shell[data-mobile="true"][data-layout="landscape"]>#interact{right:calc(112px + env(safe-area-inset-right,0px));bottom:calc(70px + env(safe-area-inset-bottom,0px));width:48px;height:48px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .utilitybar{right:calc(112px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+#game-shell[data-mobile="true"][data-layout="landscape"] .utilitybar button{min-width:36px;height:34px}
+#game-shell[data-mobile="true"][data-layout="landscape"] .quest-hud{top:54px}
+#game-shell[data-mobile="true"][data-layout="landscape"] #quest-drawer-toggle{min-height:38px}
+#game-shell[data-mobile="true"][data-layout="landscape"] #quest-drawer-body{max-height:calc(var(--view-height) - 64px)}
+#game-shell[data-mobile="true"][data-layout="landscape"] #status-hud{top:62px;left:180px}
+#game-shell[data-mobile="true"][data-layout="landscape"] #target-hud{top:58px}
+#game-shell[data-mobile="true"][data-layout="landscape"] #mechanic-hud{top:95px}
